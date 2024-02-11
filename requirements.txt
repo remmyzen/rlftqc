@@ -1,0 +1,12 @@
+jax
+jaxlib
+gymnax
+evosax
+distrax
+optax
+flax
+numpy
+brax
+qiskit
+stim
+pylatexenc
