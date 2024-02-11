@@ -1,4 +1,4 @@
-# rl-ftqc - Reinforcement Learning for Fault-Tolerant Quantum Circuit Discovery
+# rlftqc - Reinforcement Learning for Fault-Tolerant Quantum Circuit Discovery
 
 [![arXiv](https://img.shields.io/badge/arXiv-1234.56789-b31b1b.svg)](https://arxiv.org/abs/1234.56789)
 
