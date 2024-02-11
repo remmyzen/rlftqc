@@ -2,6 +2,7 @@ from qiskit import QuantumCircuit
 
 def convert_stim_to_qiskit_circuit(encoding_circuit):
     """ Convert stim circuit to Qiskit circuit.
+    
     Args:
         encoding_circuit: Encoding circuit in Stim format. 
     """

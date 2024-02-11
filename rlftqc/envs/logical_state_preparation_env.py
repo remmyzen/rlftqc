@@ -132,6 +132,7 @@ class LogicalStatePreparationEnv(environment.Environment):
     def action_matrix(self,
                       params: Optional[EnvParams] = EnvParams) -> chex.Array:
         """ Generate the action matrix.
+
         Args:
             params (optional): Parameters of the environment
 
@@ -176,9 +177,11 @@ class LogicalStatePreparationEnv(environment.Environment):
   
     def hamming(self, vec1, vec2):
         """ Compute hamming distance of the tableau for the reward.
+        
         Args:
             vec1: Vector 1 input.
             vec2: Vector 2 input.
+        
         Returns:
             Hamming distance between vec1 and vec2.
         """
@@ -186,9 +189,11 @@ class LogicalStatePreparationEnv(environment.Environment):
 
     def jaccard(self, vec1, vec2):
         """ Compute jaccard distance of the tableau for the reward.
+        
         Args:
             vec1: Vector 1 input.
             vec2: Vector 2 input.
+        
         Returns:
             Jaccard distance between vec1 and vec2.
         """
@@ -198,9 +203,11 @@ class LogicalStatePreparationEnv(environment.Environment):
 
     def get_distance(self, tableaus, signs):
         ''' Evaluate the distance with the target tableau for the reward.
+        
         Args:
             tableaus: The tableau of the current quantum circuit.
             signs: The sign of stabilizers of the current quantum circuit.
+        
         Returns:
             Distance.
         '''
@@ -222,6 +229,7 @@ class LogicalStatePreparationEnv(environment.Environment):
             current_tableau: The tableau after applying the action.
             sign: The sign from the previous action.
             action: The action applied
+        
         Return: 
             Updated sign after applying action
         """

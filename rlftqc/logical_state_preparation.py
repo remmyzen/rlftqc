@@ -14,6 +14,17 @@ import stim
 
 class LogicalStatePreparation:
     """ Class for training RL agent for logical state preparation task.
+
+    Args:
+        target (list(str)): List of stabilizers of the target state as a string.
+        gates (optional): List of clifford gates to prepare the state. Default: H, S, CX. 
+        graph (list(tuple), optional): Graph of the qubit connectivity. Default: all-to-all qubit connectivity.
+        distance_metric (str, optional): Distance metric to use for the complementary distance reward. Currently only support 'hamming' or 'jaccard' (default).
+        max_steps (int, optional): The number of maximum gates to be applied in the circuit. Default: 50
+        threshold (float, optional): The complementary distance threshold to indicates success. Default: 0.99
+        initialize_plus (list(int), optional): Initialize qubits given in the list as plus state instead of zero state. This is useful for large CSS codes or CZ is used in the gate set.
+        training_config (optional): Training configuration.
+        seed (int, optional): Random seed (default: 42) 
     """
 
     def __init__(self,
@@ -26,22 +37,7 @@ class LogicalStatePreparation:
         initialize_plus = [],
         training_config = None,
         seed = 42):
-        """
-        Initialize a logical state preparation task.
-
-        Args:
-            target (list(str)): List of stabilizers of the target state as a string.
-            gates (list(CliffordGates), optional): List of clifford gates to prepare the state. Default: H, S, CX. 
-            graph (list(tuple), optional): Graph of the qubit connectivity. Default: all-to-all qubit connectivity.
-            distance_metric (str, optional): Distance metric to use for the complementary distance reward.
-                Currently only support 'hamming' or 'jaccard' (default).
-            max_steps (int, optional): The number of maximum gates to be applied in the circuit. Default: 50
-            threshold (float, optional): The complementary distance threshold to indicates success. Default: 0.99
-            initialize_plus (list(int), optional): Initialize qubits given in the list as plus state instead of zero state.
-                This is useful for large CSS codes or CZ is used in the gate set.
-            training_config (optional): Training configuration.
-            seed (int, optional): Random seed (default: 42) 
-        """
+        """ Initialize a logical state preparation task. """
 
         ## Initialize the environment
         self.env = LogicalStatePreparationEnv(target, gates, graph, distance_metric, max_steps, threshold, initialize_plus)
@@ -71,8 +67,7 @@ class LogicalStatePreparation:
 
 
     def train(self):
-        """ Training the agent.
-        """
+        """ Training the agent. """
         #### Training
         rng = jax.random.PRNGKey(self.seed)
         rngs = jax.random.split(rng, self.training_config['NUM_AGENTS'])
@@ -85,6 +80,9 @@ class LogicalStatePreparation:
 
     def run(self, results_folder_name=None):
         """ Run the trained agent.
+
+        Args:
+            results_folder_name (str): Name of the results folder.
         """        
         assert hasattr(self, 'outs'), "Call train() first to train the model."
 
@@ -171,10 +169,10 @@ class LogicalStatePreparation:
 
     def log(self, results_folder_name=None):
         """ Log and visualize the training progress.
+
         Args:
             results_folder_name (str): Name of the results folder.
         """
-        ""
         assert hasattr(self, 'outs'), "Call train() first to train the model."
 
                     
