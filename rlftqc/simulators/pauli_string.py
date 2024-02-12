@@ -145,7 +145,7 @@ class PauliString:
         '''
         Copy PauliString
         '''
-        new_pauli = PauliStringJax()
+        new_pauli = PauliString()
         new_pauli.index_matrix = jnp.copy(self.index_matrix)
         new_pauli.num_qubits = self.num_qubits
         new_pauli.batch_size = self.batch_size 
@@ -305,7 +305,7 @@ class PauliString:
         ## Multiply (sum modulo 2) all of the powerset element + IIIII...I
         new_check_matrix = jnp.array([jnp.zeros(self.num_qubits * 2)] + [functools.reduce(lambda x,y: (x+y) % 2, mat) for mat in powerset]).astype(jnp.uint8)
 
-        return PauliStringJax().from_numpy(new_check_matrix)
+        return PauliString().from_numpy(new_check_matrix)
     
     def multiply_each(self):
         '''
@@ -322,8 +322,8 @@ class PauliString:
         
 
         check_matrix_new = jnp.array(check_matrix_new).astype(jnp.uint8)
-        new_paulistring = PauliStringJax().from_numpy(check_matrix_new)
-        return PauliStringJax().from_numpy(check_matrix_new)
+        new_paulistring = PauliString().from_numpy(check_matrix_new)
+        return PauliString().from_numpy(check_matrix_new)
 
 
     def multiply(self, pauli):
@@ -398,7 +398,7 @@ class PauliString:
         return self
     
     def get_unique(self, size):
-        new_pauli = PauliStringJax()
+        new_pauli = PauliString()
         new_pauli.index_matrix = jnp.unique(self.index_matrix, axis = 0, size=size)
         new_pauli.num_qubits = self.num_qubits
         new_pauli.batch_size = size 
