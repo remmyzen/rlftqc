@@ -6,7 +6,7 @@ Code repository for quantum circuit discovery for fault-tolerant logical state p
 
 - [Description](#description)
 - [Installation](#installation)
-- [Usage](#usage)
+- [Minimal Examples](#minimal-examples)
 - [License](#license)
 - [Citation](#citation)
   
@@ -24,15 +24,42 @@ For all the tasks, the user can specify the Clifford gate set and qubit connecti
 
 ## Installation
 
-## Usage
+1. Clone the repository
 
+``` bash
+git clone https://github.com/remmyzen/rlftqc.git
+cd rlftqc
+```
+
+2. Install requirements
+``` bash
+pip install -r requirements.txt
+```
+## Minimal Examples
+
+### Logical State Preparation
+For logical state preparation, you only need to specify the target stabilizers of your logical state. 
+
+For example, the code below will train an RL agent to prepare $|0\rangle_L$ of the 7-qubit Steane code. It uses $H$, $S$, and $CNOT$ gates and all-to-all qubit connectivity by default.
+
+``` python
+from rlftqc.logical_state_preparation import LogicalStatePreparation
+
+target = ["+ZZZZZZZ", "+ZIZIZIZ", "+XIXIXIX", "+IZZIIZZ", "+IXXIIXX", "+IIIZZZZ", "+IIIXXXX"]
+
+lsp = LogicalStatePreparation(target)
+lsp.train()   ## Train the agent
+lsp.run()     ## Run the agent to get the circuit
+```
+
+Refer to the notebook `notebooks/01 - Logical State Preparation.ipynb` for more advanced examples (e.g. change the gate set and qubit connectivity).
 
 ## License
 
-MIT License
+The code in this repository is released under the MIT License.
 
 ## Citation
-```
+``` bib
 @article{zen2024quantum,
   title={Quantum Circuit Discovery for Fault-Tolerant Logical State Preparation with Reinforcement Learning},
   author={},
@@ -40,7 +67,6 @@ MIT License
   year={2024}
 }
 ```
-
 
 ## References
 [1] Chamberland, Christopher, and Michael E. Beverland. "Flag fault-tolerant error correction with arbitrary distance codes." Quantum 2 (2018): 53.
