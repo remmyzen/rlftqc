@@ -1,3 +1,5 @@
 from rlftqc.envs.logical_state_preparation_env import LogicalStatePreparationEnv
 from rlftqc.envs.verification_circuit_synthesis_env import VerificationCircuitSynthesisEnv
+from rlftqc.envs.ft_logical_state_preparation_env import FTLogicalStatePreparationEnv
+
 
