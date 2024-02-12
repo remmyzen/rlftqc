@@ -1,8 +1,8 @@
 jax
 jaxlib
 gymnax
-evosax
 distrax
+evosax
 optax
 flax
 numpy
@@ -11,3 +11,4 @@ qiskit
 stim
 pylatexenc
 matplotlib
+more_itertools
