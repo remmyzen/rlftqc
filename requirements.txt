@@ -10,3 +10,4 @@ brax
 qiskit
 stim
 pylatexenc
+matplotlib
