@@ -7,8 +7,10 @@ optax
 flax
 numpy
 brax
-qiskit
+qiskit==0.46
 stim
 pylatexenc
 matplotlib
 more_itertools
+networkx
+cirq
