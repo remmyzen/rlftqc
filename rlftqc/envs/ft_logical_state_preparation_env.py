@@ -7,6 +7,7 @@ from inspect import signature
 from typing import Tuple, Optional
 import itertools
 from rlftqc.simulators import PauliString, TableauSimulator, CliffordGates
+from utils import is_css_code
 
 
 @struct.dataclass
@@ -109,6 +110,8 @@ class FTLogicalStatePreparationEnv(environment.Environment):
             target_wo_sign.append(stab_wo_sign)
         self.target_tableau = PauliString(target_wo_sign)
 
+        self.is_css = is_css_code(self.target)
+
         self.num_ancillas = num_ancillas
         self.n_qubits_physical = self.n_qubits_physical_encoding + self.num_ancillas
 
@@ -116,8 +119,14 @@ class FTLogicalStatePreparationEnv(environment.Environment):
         self.gates = gates
         if self.gates is None:
             clifford_gates = CliffordGates(self.n_qubits_physical)
-            ## Initialize with the standard gate set + CZ 
-            self.gates = [clifford_gates.h, clifford_gates.s, clifford_gates.cz, clifford_gates.cx] 
+             ## Initialize with the standard gate set + CZ minus S for non-CSS
+            if self.is_css:
+                print("Code is CSS, but gate set is not specified using H, S, and CX as the default gate set.")
+                self.gates = [clifford_gates.h, clifford_gates.s, clifford_gates.cx] 
+            else:               
+                print("Code is non-CSS, but gate set is not specified using H, S, CX, and CZ as the default gate set.")
+                self.gates = [clifford_gates.h, clifford_gates.s, clifford_gates.cz, clifford_gates.cx] 
+
 
         ## Create qubit connectivity graph
         self.graph = graph
@@ -137,6 +146,10 @@ class FTLogicalStatePreparationEnv(environment.Environment):
         self.mul_errors_with_generators = mul_errors_with_generators ## multiply error with generators might reduce number of errors but make the process slower
         self.mul_errors_with_S = mul_errors_with_S ## multiply error with S
 
+        if not self.is_css and not self.mul_errors_with_S:
+            print("Code is non-CSS, multiply errors with S is set to True. It might need a big memory for bigger codes.")
+            self.mul_errors_with_S = True
+
         self.weight_distance = weight_distance
         if self.weight_distance is None:
             self.weight_distance = self.n_qubits_physical_encoding 
@@ -151,8 +164,11 @@ class FTLogicalStatePreparationEnv(environment.Environment):
 
         self.ignore_x_errors = ignore_x_errors
         self.ignore_y_errors = ignore_y_errors
-        self.ignore_z_errors = ignore_z_errors       
-
+        self.ignore_z_errors = ignore_z_errors    
+        
+        if self.is_css and not self.ignore_x_errors and not self.ignore_y_errors and not self.ignore_z_errors:
+            print("WARNING! Code is CSS but no errors are ignored. You might want to set to ignore some error depending on the logical state that you are preparing. For example: For zero-logical, then Z errors can be ignored and add ignore_z_errors = True as an argument.")
+   
         self.ancilla_target_only = ancilla_target_only
         self.ancilla_control_only = ancilla_control_only
         self.gates_between_ancilla = gates_between_ancilla

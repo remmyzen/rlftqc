@@ -8,7 +8,7 @@ from typing import Tuple, Optional
 from qiskit import QuantumCircuit
 import stim
 from rlftqc.simulators import PauliString, TableauSimulator, CliffordGates
-from rlftqc.utils import convert_qiskit_to_stim_circuit
+from rlftqc.utils import convert_qiskit_to_stim_circuit, is_css_code
 import itertools
 
 @struct.dataclass
@@ -92,16 +92,27 @@ class VerificationCircuitSynthesisEnv(environment.Environment):
             raise NotImplementedError("Only stim.Circuit or qiskit.QuantumCircuit object is supported.")
         
 
+
         self.n_qubits_physical_encoding = self.encoding_circuit.num_qubits
         self.num_ancillas = num_ancillas
         self.n_qubits_physical = self.n_qubits_physical_encoding + self.num_ancillas
+
+        self.encoding_tableau = stim.Tableau(self.n_qubits_physical_encoding).from_circuit(self.encoding_circuit)
+
+        ## Check for CSS
+        self.is_css = is_css_code([str(self.encoding_tableau.z_output(ii)) for ii in range(self.n_qubits_physical_encoding)])
 
         ## Process gates
         self.gates = gates
         if self.gates is None:
             clifford_gates = CliffordGates(self.n_qubits_physical)
-            ## Initialize with the standard gate set + CZ minus S
-            self.gates = [clifford_gates.h, clifford_gates.cz, clifford_gates.cx] 
+            ## Initialize with the standard gate set + CZ minus S for non-CSS
+            if self.is_css:
+                print("Code is CSS, but gate set is not specified using H and CX as the default gate set.")
+                self.gates = [clifford_gates.h, clifford_gates.cx] 
+            else:               
+                print("Code is non-CSS, but gate set is not specified using H, CX, and CZ as the default gate set.")
+                self.gates = [clifford_gates.h, clifford_gates.cz, clifford_gates.cx] 
 
         ## Create qubit connectivity graph
         self.graph = graph
@@ -121,6 +132,10 @@ class VerificationCircuitSynthesisEnv(environment.Environment):
 
         self.mul_errors_with_generators = mul_errors_with_generators ## multiply error with generators might reduce number of errors but make the process slower
         self.mul_errors_with_S = mul_errors_with_S ## multiply error with S
+
+        if not self.is_css and not self.mul_errors_with_S:
+            print("Code is non-CSS, multiply errors with S is set to True. It might need a big memory for bigger codes.")
+            self.mul_errors_with_S = True
         
         self.weight_flag = weight_flag
 
@@ -137,7 +152,10 @@ class VerificationCircuitSynthesisEnv(environment.Environment):
 
         self.ignore_x_errors = ignore_x_errors
         self.ignore_y_errors = ignore_y_errors
-        self.ignore_z_errors = ignore_z_errors       
+        self.ignore_z_errors = ignore_z_errors   
+
+        if self.is_css and not self.ignore_x_errors and not self.ignore_y_errors and not self.ignore_z_errors:
+            print("WARNING! Code is CSS but no errors are ignored. You might want to set to ignore some error depending on the logical state that you are preparing. For example: For zero-logical, then Z errors can be ignored and add ignore_z_errors = True as an argument.")
 
         self.ancilla_target_only = ancilla_target_only
         self.ancilla_control_only = ancilla_control_only
@@ -149,7 +167,6 @@ class VerificationCircuitSynthesisEnv(environment.Environment):
         self.zero_ancilla_position = jnp.delete(jnp.arange(self.n_qubits_physical_encoding, self.n_qubits_physical_encoding+self.num_ancillas),  self.plus_ancilla_position  - self.n_qubits_physical_encoding)
         
         ### Process encoding tableau
-        self.encoding_tableau = stim.Tableau(self.n_qubits_physical_encoding).from_circuit(self.encoding_circuit)
         self.encoding_tableau_with_ancilla, self.encoding_tableau_signs = self.stim_tableau_to_numpy(self.encoding_tableau, num_ancillas=self.num_ancillas)
         self.initial_tableau_with_ancillas = TableauSimulator(self.n_qubits_physical_encoding, initial_tableau=self.encoding_tableau_with_ancilla, initial_sign =self.encoding_tableau_signs)
         

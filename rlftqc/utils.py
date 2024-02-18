@@ -73,3 +73,22 @@ def convert_qiskit_to_stim_circuit(encoding_circuit):
             raise NotImplementedError("%s gate is not yet supported", gate_name)
 
     return circ
+
+def is_css_code(stabilizer_generators):
+    """ Check if the given generators is a CSS code (every generators only contains all X or Z).
+
+    This is used to give hints for synthesizing the verification circuit.
+
+    Args:
+        stabilizer_generators (list(str)): The list of stabilizer generators as a list of string.
+
+    Returns:
+        If the code is CSS or not.
+    """
+    is_css = True
+    for generator in stabilizer_generators:
+        # Check if Y is in the generator or X and Z is in the generator.
+        if 'y' in generator.lower() or ('x' in generator.lower() and 'z' in generator.lower()):
+            is_css = False
+            break
+    return is_css
