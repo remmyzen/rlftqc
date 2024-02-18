@@ -7,7 +7,7 @@ from inspect import signature
 from typing import Tuple, Optional
 import itertools
 from rlftqc.simulators import PauliString, TableauSimulator, CliffordGates
-from utils import is_css_code
+from rlftqc.utils import is_css_code
 
 
 @struct.dataclass
@@ -37,7 +37,7 @@ class FTLogicalStatePreparationEnv(environment.Environment):
             gates=None, 
             graph=None,  
             max_steps = 50,
-            threshold = 0.99,
+            threshold = 0.99999,
             mul_errors_with_generators = True,
             mul_errors_with_S = False,
             ignore_x_errors = False,
@@ -149,6 +149,9 @@ class FTLogicalStatePreparationEnv(environment.Environment):
         if not self.is_css and not self.mul_errors_with_S:
             print("Code is non-CSS, multiply errors with S is set to True. It might need a big memory for bigger codes.")
             self.mul_errors_with_S = True
+        
+        if self.mul_errors_with_S and self.mul_errors_with_generators:
+            self.mul_errors_with_generators = False
 
         self.weight_distance = weight_distance
         if self.weight_distance is None:

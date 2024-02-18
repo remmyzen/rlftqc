@@ -50,7 +50,7 @@ class FTLogicalStatePreparation:
         gates=None,   
         graph=None,    
         max_steps = 50,
-        threshold = 0.99,                 
+        threshold = 0.99999,                 
         mul_errors_with_generators = True,
         mul_errors_with_S = False,
         ignore_x_errors = False,

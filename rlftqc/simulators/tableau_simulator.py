@@ -41,7 +41,7 @@ class TableauSimulator():
         h_operator = jnp.eye(2*self.n, dtype=jnp.uint8)
         
         # Swap columns i and i+n
-        temp = h_operator[:,i].copy()
+        temp = h_operator[:,qubit].copy()
         h_operator = h_operator.at[:,qubit].set(h_operator[:,qubit+self.n])
         h_operator = h_operator.at[:,qubit+self.n].set(temp)
         

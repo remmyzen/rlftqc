@@ -38,7 +38,7 @@ class VerificationCircuitSynthesisEnv(environment.Environment):
         gates=None,   
         graph=None,    
         max_steps = 10,
-        threshold = 0.99,                 
+        threshold = 0.99999,                 
         mul_errors_with_generators = True,
         mul_errors_with_S = False,
         ignore_x_errors = False,
@@ -133,10 +133,14 @@ class VerificationCircuitSynthesisEnv(environment.Environment):
         self.mul_errors_with_generators = mul_errors_with_generators ## multiply error with generators might reduce number of errors but make the process slower
         self.mul_errors_with_S = mul_errors_with_S ## multiply error with S
 
+
         if not self.is_css and not self.mul_errors_with_S:
             print("Code is non-CSS, multiply errors with S is set to True. It might need a big memory for bigger codes.")
             self.mul_errors_with_S = True
         
+        if self.mul_errors_with_S and self.mul_errors_with_generators:
+            self.mul_errors_with_generators = False
+            
         self.weight_flag = weight_flag
 
         if self.weight_flag is None:
@@ -165,7 +169,6 @@ class VerificationCircuitSynthesisEnv(environment.Environment):
         self.group_ancillas = group_ancillas
         self.plus_ancilla_position = jnp.array(plus_ancilla_position, dtype=jnp.int32)
         self.zero_ancilla_position = jnp.delete(jnp.arange(self.n_qubits_physical_encoding, self.n_qubits_physical_encoding+self.num_ancillas),  self.plus_ancilla_position  - self.n_qubits_physical_encoding)
-        
         ### Process encoding tableau
         self.encoding_tableau_with_ancilla, self.encoding_tableau_signs = self.stim_tableau_to_numpy(self.encoding_tableau, num_ancillas=self.num_ancillas)
         self.initial_tableau_with_ancillas = TableauSimulator(self.n_qubits_physical_encoding, initial_tableau=self.encoding_tableau_with_ancilla, initial_sign =self.encoding_tableau_signs)

@@ -48,7 +48,7 @@ class VerificationCircuitSynthesis:
         gates=None,   
         graph=None,    
         max_steps = None,
-        threshold = 0.99,                 
+        threshold = 0.99999,                 
         mul_errors_with_generators = True,
         mul_errors_with_S = False,
         ignore_x_errors = False,
@@ -69,8 +69,6 @@ class VerificationCircuitSynthesis:
 
         if max_steps is None:
             max_steps = 10 * num_ancillas
-
-        #### CHECK CSS CODE
 
         ## Initialize the environment
         self.env = VerificationCircuitSynthesisEnv(encoding_circuit, 
@@ -94,7 +92,6 @@ class VerificationCircuitSynthesis:
                 gates_between_data, 
                 group_ancillas,  
                 plus_ancilla_position)
-
         self.seed = seed
 
         ## Get the agent
