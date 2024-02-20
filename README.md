@@ -7,9 +7,9 @@ Code repository for quantum circuit discovery for fault-tolerant logical state p
 - [Description](#description)
 - [Installation](#installation)
 - [Minimal Examples](#minimal-examples)
-    1. [Logical State Preparation](#logical-state-preparation)
-    2. [Verification Circuit Synthesis](#verification-circuit-synthesis)
-    3. [Integrated Fault-Tolerant Logical State Preparation](#integrated-fault-tolerant-logical-state-preparation)
+    1. [Logical State Preparation](#logical-state-preparation)   <a href="#"><img src="https://colab.research.google.com/assets/colab-badge.svg" alt="Open In Colab"/></a>
+    2. [Verification Circuit Synthesis](#verification-circuit-synthesis)  <a href="#"><img src="https://colab.research.google.com/assets/colab-badge.svg" alt="Open In Colab"/></a>
+    3. [Integrated Fault-Tolerant Logical State Preparation](#integrated-fault-tolerant-logical-state-preparation)  <a href="#"><img src="https://colab.research.google.com/assets/colab-badge.svg" alt="Open In Colab"/></a>
 - [License](#license)
 - [Citation](#citation)
   
@@ -20,7 +20,7 @@ This library can be used to train an RL agent for three different tasks:
 2. **Verification Circuit Synthesis**: Prepare a verification circuit from a given logical state preparation circuit based on flag-qubit protocols [1] to make the state preparation fault-tolerant.
 3. **Integrated Fault-Tolerant Logical State Preparation**: Integrates the two tasks above to prepare a logical state fault-tolerantly.
 
-For all the tasks, the user can specify the Clifford gate set and qubit connectivity.
+For all the tasks, the user can specify the Clifford gate set and qubit connectivity. The folder <a href="circuits">`circuits`</a> shows circuit examples that the RL agent prepared. 
 
 <img src="images/overview.png" alt="overview" width="800"/>
 
@@ -40,7 +40,9 @@ pip install -r requirements.txt
 ```
 ## Minimal Examples
 
-### Logical State Preparation
+### Logical State Preparation  
+<a href="#"><img src="https://colab.research.google.com/assets/colab-badge.svg" alt="Open In Colab"/></a>
+
 For the logical state preparation task, you only need to specify the target stabilizers of your logical state. 
 
 For example, the code below will train an RL agent to prepare the $|0\rangle_L$ of the 7-qubit Steane code. It uses $H$, $S$, and $CNOT$ gates and all-to-all qubit connectivity by default.
@@ -57,7 +59,10 @@ lsp.run()     ## Run the agent to get the circuit
 
 Refer to the notebook `notebooks/01 - Logical State Preparation.ipynb` for more advanced examples (e.g. change the gate set and qubit connectivity).
 
-### Verification Circuit Synthesis
+### Verification Circuit Synthesis  
+
+<a href="#"><img src="https://colab.research.google.com/assets/colab-badge.svg" alt="Open In Colab"/></a>
+
 For the verification circuit synthesis task, you only need to specify the encoding circuit as a `stim.Circuit` [(see reference)](https://github.com/quantumlib/Stim/blob/main/doc/python_api_reference_vDev.md#stim.Circuit) or `qiskit.QuantumCircuit` [(see reference)](https://docs.quantum.ibm.com/api/qiskit/qiskit.circuit.QuantumCircuit) instance. 
 
 For example, the code below will train an RL agent to synthesize a verification circuit to prepare $|0\rangle_L$ of the 7-qubit Steane code fault-tolerantly. 
@@ -79,7 +84,8 @@ vcs.run()     ## Run the agent to get the circuit
 Refer to the notebook `notebooks/02 - Verification Circuit Synthesis.ipynb` for more advanced examples.
 
 ### Integrated Fault-Tolerant Logical State Preparation
-
+<a href="#"><img src="https://colab.research.google.com/assets/colab-badge.svg" alt="Open In Colab"/></a>
+  
 For the integrated logical state preparation task, you only need to specify the target stabilizers of your logical state. 
 
 For example, the code below will train an RL agent to prepare the $|0\rangle_L$ of the 7-qubit Steane code fault-tolerantly. 
