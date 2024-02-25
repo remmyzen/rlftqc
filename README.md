@@ -10,6 +10,7 @@ Code repository for quantum circuit discovery for fault-tolerant logical state p
     1. [Logical State Preparation](#logical-state-preparation)   <a href="https://colab.research.google.com/drive/1u2iokg1ZBF6YeB6-UuzmbFqAo_3KlCu-" target="_blank"><img src="https://colab.research.google.com/assets/colab-badge.svg" alt="Open In Colab"/></a>
     2. [Verification Circuit Synthesis](#verification-circuit-synthesis)  <a href="https://colab.research.google.com/drive/1OJJ_DSpO7zUeoBZruXMIpntbWjXylVPf" target="_blank"><img src="https://colab.research.google.com/assets/colab-badge.svg" alt="Open In Colab"/></a>
     3. [Integrated Fault-Tolerant Logical State Preparation](#integrated-fault-tolerant-logical-state-preparation)  <a href="#"><img src="https://colab.research.google.com/assets/colab-badge.svg" alt="Open In Colab"/></a>
+- [Circuit Examples](#circuit-examples)
 - [License](#license)
 - [Citation](#citation)
   
@@ -20,7 +21,7 @@ This library can be used to train an RL agent for three different tasks:
 2. **Verification Circuit Synthesis**: Prepare a verification circuit from a given logical state preparation circuit based on flag-qubit protocols [1] to make the state preparation fault-tolerant.
 3. **Integrated Fault-Tolerant Logical State Preparation**: Integrates the above two tasks to prepare a logical state fault-tolerantly.
 
-For all the tasks, the user can specify the Clifford gate set and qubit connectivity. <a href="circuits">`circuits`</a> folder shows circuit examples prepared by the RL agent. 
+For all the tasks, the user can specify the Clifford gate set and qubit connectivity. 
 
 <img src="images/overview.png" alt="overview" width="800"/>
 
@@ -104,6 +105,10 @@ ftlsp.run()     ## Run the agent to get the circuit
 
 ```
 Refer to the notebook `notebooks/03 - Integrated Fault-Tolerant Logical State Preparation.ipynb` for more advanced examples. <a href="#"><img src="https://colab.research.google.com/assets/colab-badge.svg" alt="Open In Colab"/></a>
+
+## Circuit Examples
+
+Go to this <a href="https://owncloud.gwdg.de/index.php/s/OsfE9WuvTitJuZv">link</a> to see the circuit examples that the RL agent has synthesized for various tasks in PNG, stim, and Latex formats.
 
 ## License
 
