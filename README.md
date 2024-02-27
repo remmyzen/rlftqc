@@ -1,6 +1,6 @@
 # rlftqc - Reinforcement Learning for Fault-Tolerant Quantum Circuit Discovery
 
-[![arXiv](https://img.shields.io/badge/arXiv-1234.56789-b31b1b.svg)](https://arxiv.org/abs/1234.56789)
+[![arXiv](https://img.shields.io/badge/arXiv-2402.12345-b31b1b.svg)](https://arxiv.org/abs/2402.12345)
 
 Code repository for quantum circuit discovery for fault-tolerant logical state preparation with reinforcement learning. 
 
@@ -9,7 +9,7 @@ Code repository for quantum circuit discovery for fault-tolerant logical state p
 - [Minimal Examples](#minimal-examples)
     1. [Logical State Preparation](#logical-state-preparation)   <a href="https://colab.research.google.com/drive/1u2iokg1ZBF6YeB6-UuzmbFqAo_3KlCu-" target="_blank"><img src="https://colab.research.google.com/assets/colab-badge.svg" alt="Open In Colab"/></a>
     2. [Verification Circuit Synthesis](#verification-circuit-synthesis)  <a href="https://colab.research.google.com/drive/1OJJ_DSpO7zUeoBZruXMIpntbWjXylVPf" target="_blank"><img src="https://colab.research.google.com/assets/colab-badge.svg" alt="Open In Colab"/></a>
-    3. [Integrated Fault-Tolerant Logical State Preparation](#integrated-fault-tolerant-logical-state-preparation)  <a href="#"><img src="https://colab.research.google.com/assets/colab-badge.svg" alt="Open In Colab"/></a>
+    3. [Integrated Fault-Tolerant Logical State Preparation](#integrated-fault-tolerant-logical-state-preparation)  <a href="https://colab.research.google.com/drive/1kcq8q0C1jE8J5xSVy19fpsnr0KdPTQwe" target="_blank"><img src="https://colab.research.google.com/assets/colab-badge.svg" alt="Open In Colab"/></a>
 - [Circuit Examples](#circuit-examples)
 - [License](#license)
 - [Citation](#citation)
@@ -42,11 +42,12 @@ pip install -r requirements.txt
 ## Minimal Examples
 
 ### Logical State Preparation  
-<a href="https://colab.research.google.com/drive/1u2iokg1ZBF6YeB6-UuzmbFqAo_3KlCu-" target="_blank"><img src="https://colab.research.google.com/assets/colab-badge.svg" alt="Open In Colab"/></a>
 
 For the logical state preparation task, you only need to specify the target stabilizers of your logical state. 
 
 For example, the code below will train an RL agent to prepare the $|0\rangle_L$ of the 7-qubit Steane code. It uses $H$, $S$, and $CNOT$ gates and all-to-all qubit connectivity by default.
+
+<a href="https://colab.research.google.com/drive/1u2iokg1ZBF6YeB6-UuzmbFqAo_3KlCu-" target="_blank"><img src="https://colab.research.google.com/assets/colab-badge.svg" alt="Open In Colab"/></a>
 
 ``` python
 from rlftqc.logical_state_preparation import LogicalStatePreparation
@@ -58,16 +59,17 @@ lsp.train()   ## Train the agent
 lsp.run()     ## Run the agent to get the circuit
 ```
 
-Refer to the notebook `notebooks/01 - Logical State Preparation.ipynb` for more advanced examples (e.g. change the gate set and qubit connectivity). <a href="#"><img src="https://colab.research.google.com/assets/colab-badge.svg" alt="Open In Colab"/></a>
+Refer to the notebook `notebooks/01 - Logical State Preparation.ipynb` <a href="https://drive.google.com/file/d/1EBmGK5bSTiSBJdnbAYyRLWfqJlXwm6NK/view?usp=sharing" target="_blank"><img src="https://colab.research.google.com/assets/colab-badge.svg" alt="Open In Colab"/></a> for more advanced examples (e.g. change the gate set and qubit connectivity). 
 
 
 ### Verification Circuit Synthesis  
 
-<a href="https://colab.research.google.com/drive/1OJJ_DSpO7zUeoBZruXMIpntbWjXylVPf" target="_href"><img src="https://colab.research.google.com/assets/colab-badge.svg" alt="Open In Colab"/></a>
 
 For the verification circuit synthesis task, you only need to specify the encoding circuit as a `stim.Circuit` [(see reference)](https://github.com/quantumlib/Stim/blob/main/doc/python_api_reference_vDev.md#stim.Circuit) or `qiskit.QuantumCircuit` [(see reference)](https://docs.quantum.ibm.com/api/qiskit/qiskit.circuit.QuantumCircuit) instance. 
 
 For example, the code below will train an RL agent to synthesize a verification circuit to fault-tolerantly prepare $|0\rangle_L$ of the 7-qubit Steane code.
+
+<a href="https://colab.research.google.com/drive/1OJJ_DSpO7zUeoBZruXMIpntbWjXylVPf" target="_blank"><img src="https://colab.research.google.com/assets/colab-badge.svg" alt="Open In Colab"/></a>
 
 ``` python
 import stim
@@ -83,15 +85,16 @@ vcs.train()   ## Train the agent
 vcs.run()     ## Run the agent to get the circuit
 ```
 
-Refer to the notebook `notebooks/02 - Verification Circuit Synthesis.ipynb` for more advanced examples. <a href="#"><img src="https://colab.research.google.com/assets/colab-badge.svg" alt="Open In Colab"/></a>
+Refer to the notebook `notebooks/02 - Verification Circuit Synthesis.ipynb` <a href="https://drive.google.com/file/d/1gtI2cxYOsspWSHffVSsXry_0teQ_4d9b/view?usp=sharing" target="_blank"><img src="https://colab.research.google.com/assets/colab-badge.svg" alt="Open In Colab"/></a> for more advanced examples. 
 
 
 ### Integrated Fault-Tolerant Logical State Preparation
-<a href="#"><img src="https://colab.research.google.com/assets/colab-badge.svg" alt="Open In Colab"/></a>
   
 For the integrated logical state preparation task, you only need to specify the target stabilizers of your logical state. 
 
 For example, the code below will train an RL agent to  fault-tolerantly prepare the $|0\rangle_L$ of the 7-qubit Steane code. 
+
+<a href="https://colab.research.google.com/drive/1kcq8q0C1jE8J5xSVy19fpsnr0KdPTQwe?usp=sharing" target="_blank"><img src="https://colab.research.google.com/assets/colab-badge.svg" alt="Open In Colab"/></a>
 
 ``` python
 from rlftqc.ft_logical_state_preparation import FTLogicalStatePreparation
@@ -104,11 +107,11 @@ ftlsp.train()   ## Train the agent
 ftlsp.run()     ## Run the agent to get the circuit
 
 ```
-Refer to the notebook `notebooks/03 - Integrated Fault-Tolerant Logical State Preparation.ipynb` for more advanced examples. <a href="#"><img src="https://colab.research.google.com/assets/colab-badge.svg" alt="Open In Colab"/></a>
-
+Refer to the notebook `notebooks/03 - Integrated Fault-Tolerant Logical State Preparation.ipynb` <a href="https://drive.google.com/file/d/12zTTrUSPTK0dRym5XTizm2ugcZsoeki8/view?usp=sharing" target="_blank"><img src="https://colab.research.google.com/assets/colab-badge.svg" alt="Open In Colab"/></a>
+ for more advanced examples. 
 ## Circuit Examples
 
-Go to this <a href="https://owncloud.gwdg.de/index.php/s/OsfE9WuvTitJuZv">link</a> to see the circuit examples that the RL agent has synthesized for various tasks in PNG, stim, and Latex formats.
+Go to this <a href="https://owncloud.gwdg.de/index.php/s/OsfE9WuvTitJuZv" target="_blank">link</a> to see the circuit examples that the RL agent has synthesized for various tasks in PNG, stim, and Latex formats.
 
 ## License
 
@@ -116,11 +119,16 @@ The code in this repository is released under the MIT License.
 
 ## Citation
 ``` bib
-@article{zen2024quantum,
+@article{zen_quantum_2024,
   title={Quantum Circuit Discovery for Fault-Tolerant Logical State Preparation with Reinforcement Learning},
-  author={},
-  journal={arXiv:2402.xxxx},
-  year={2024}
+  author={Zen, Remmy and Olle, Jan and Colmenarez, Luis and Puviani, Matteo and Mueller, Markus and Marquardt, Florian},
+  url = {http://arxiv.org/abs/2402.12345},
+  journal={arXiv preprint arXiv:2402.12345},
+  urldate = {2024-02-27},
+  publisher = {arXiv},
+  month = feb,
+  year = {2024},
+  note = {arXiv:2402.12345 [quant-ph]},
 }
 ```
 
