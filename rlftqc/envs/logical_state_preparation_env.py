@@ -118,7 +118,6 @@ class LogicalStatePreparationEnv(environment.Environment):
         self.obs_shape = self.get_observation(self.initial_tableau.current_tableau[0]).flatten().shape[0] + self.n_qubits_physical ## For the sign
         self.actions = self.action_matrix()
 
-
     def get_observation(self, tableau):
         """ Extract the check matrix for the observation of the RL agent.
         Args:

@@ -62,7 +62,7 @@ class LogicalStatePreparation:
                 "MAX_GRAD_NORM": 0.5,
                 "ACTIVATION": "relu",
                 "ANNEAL_LR": True,
-                "NUM_AGENTS": 1,
+                "NUM_AGENTS": 10,
             }
 
 
@@ -97,7 +97,10 @@ class LogicalStatePreparation:
         success_length = []
         success = 0
 
-        for index in range(self.training_config['NUM_AGENTS']):
+        ## Check for converged agents
+        convergence = self.outs["metrics"]["returned_episode_lengths"].mean(-1).reshape((self.training_config['NUM_AGENTS'], -1))
+        converged_agents = np.where(convergence[:, -1] < self.env.max_steps)[0]
+        for index in converged_agents:
             ## Create a copy of parameter of the network manually
             params_new = {}
             params_new['params'] = {}

@@ -49,8 +49,8 @@ class FTLogicalStatePreparation:
         distance = 3,       
         gates=None,   
         graph=None,    
-        max_steps = 50,
-        threshold = 0.99999,                 
+        max_steps = 30,
+        threshold = 0.999999,                 
         mul_errors_with_generators = True,
         mul_errors_with_S = False,
         ignore_x_errors = False,
@@ -69,7 +69,6 @@ class FTLogicalStatePreparation:
         training_config = None,
         seed = 42):
         """ Initialize a integrated fault-tolerant state preparation task. """
-        #### CHECK CSS CODE
 
         ## Initialize the environment
         self.env = FTLogicalStatePreparationEnv(target, 
@@ -105,7 +104,7 @@ class FTLogicalStatePreparation:
                 "LR": 1e-3,
                 "NUM_ENVS": 16,
                 "NUM_STEPS": max_steps,
-                "TOTAL_TIMESTEPS": 5e5,
+                "TOTAL_TIMESTEPS": 7e5,
                 "UPDATE_EPOCHS": 4,
                 "NUM_MINIBATCHES": 4,
                 "GAMMA": 0.99,
@@ -116,7 +115,7 @@ class FTLogicalStatePreparation:
                 "MAX_GRAD_NORM": 0.5,
                 "ACTIVATION": "relu",
                 "ANNEAL_LR": True,
-                "NUM_AGENTS": 1,
+                "NUM_AGENTS": 10,
             }
 
     def train(self):
@@ -149,7 +148,10 @@ class FTLogicalStatePreparation:
         success_length = []
         success = 0
 
-        for index in range(self.training_config['NUM_AGENTS']):
+        ## Check for converged agents
+        convergence = self.outs["metrics"]["returned_episode_lengths"].mean(-1).reshape((self.training_config['NUM_AGENTS'], -1))
+        converged_agents = np.where(convergence[:, -1] < self.env.max_steps)[0]
+        for index in converged_agents:
             ## Create a copy of parameter of the network manually
             params_new = {}
             params_new['params'] = {}
@@ -185,12 +187,12 @@ class FTLogicalStatePreparation:
             
             if length < eval_env.max_steps:
 
-                length += len(eval_env.initialize_plus)
+                length += len(eval_env.plus_ancilla_position)
                 success += 1
                 success_length.append(length)
                 circ = stim.Circuit()
 
-                for x_pos in eval_env.initialize_plus:
+                for x_pos in eval_env.plus_ancilla_position:
                     circ.append("H", [x_pos])
 
                 for action in actions:

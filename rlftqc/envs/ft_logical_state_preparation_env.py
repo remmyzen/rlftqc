@@ -25,7 +25,7 @@ class EnvState:
     
 @struct.dataclass
 class EnvParams:
-    max_steps: int = 60
+    max_steps: int = 50
 
 class FTLogicalStatePreparationEnv(environment.Environment):
     """Environment for the integrated fault-tolerant logical state preparation task."""
@@ -37,7 +37,7 @@ class FTLogicalStatePreparationEnv(environment.Environment):
             gates=None, 
             graph=None,  
             max_steps = 50,
-            threshold = 0.99999,
+            threshold = 0.999999,
             mul_errors_with_generators = True,
             mul_errors_with_S = False,
             ignore_x_errors = False,
@@ -205,7 +205,6 @@ class FTLogicalStatePreparationEnv(environment.Environment):
 
         self.obs_shape = self.get_observation(self.initial_tableau_with_ancillas.current_tableau[0]).flatten().shape[0] + self.n_qubits_physical
 
-
     def get_observation(self, tableau):
         """ Extract the check matrix for the observation of the RL agent.
         Args:
@@ -244,8 +243,7 @@ class FTLogicalStatePreparationEnv(environment.Environment):
         check_mat = tableau[self.n_qubits_physical:self.n_qubits_physical + self.n_qubits_physical_encoding].astype(jnp.uint8)
 
         return check_mat
-
-   
+ 
     def action_matrix(self) -> chex.Array:
         '''
         Generate the possible actions
@@ -405,8 +403,7 @@ class FTLogicalStatePreparationEnv(environment.Environment):
         '''    
         ## Create pauli string for generators   
         generators_pauli = PauliString()
-        if self.mul_errors_with_generators:
-
+        if self.mul_errors_with_generators:                
             ## Get generator of current tableau
             generators = self.get_generators_from_tableau(tableau)
 
@@ -422,7 +419,6 @@ class FTLogicalStatePreparationEnv(environment.Environment):
         elif self.mul_errors_with_S:
             ## Get generator of current tableau
             generators = self.get_generators_from_tableau(tableau)
-
             
             ## set ancilla to I            
             generators = generators.at[:, self.n_qubits_physical - self.num_ancillas: self.n_qubits_physical].set(0)
@@ -474,7 +470,8 @@ class FTLogicalStatePreparationEnv(environment.Environment):
         measured_flag = self.measure_flag(tableaus, propagated_errors)
 
         return (jnp.sum(measured_flag) - (jnp.shape(measured_flag)[0] - number_of_errors)) /  number_of_errors
- 
+        # return jnp.mean(measured_flag)
+
     def check_ancilla_product_state(self, tableaus, signs):
         """ Check that the state is a product state with ancilla by checking that the last column and row of the ancilla in the canonical tableau is either I or Z only.
         This counts the product state reward p_t.

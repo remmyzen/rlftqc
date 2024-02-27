@@ -113,7 +113,7 @@ class VerificationCircuitSynthesis:
                 "MAX_GRAD_NORM": 0.5,
                 "ACTIVATION": "relu",
                 "ANNEAL_LR": True,
-                "NUM_AGENTS": 1,
+                "NUM_AGENTS": 10,
             }
 
     def train(self):
