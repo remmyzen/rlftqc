@@ -1,6 +1,6 @@
 # rlftqc - Reinforcement Learning for Fault-Tolerant Quantum Circuit Discovery
 
-[![arXiv](https://img.shields.io/badge/arXiv-2402.12345-b31b1b.svg)](https://arxiv.org/abs/2402.12345)
+[![arXiv](https://img.shields.io/badge/arXiv-2402.17761-b31b1b.svg)](https://arxiv.org/abs/2402.17761)
 
 Code repository for quantum circuit discovery for fault-tolerant logical state preparation with reinforcement learning. 
 
@@ -121,14 +121,14 @@ The code in this repository is released under the MIT License.
 ``` bib
 @article{zen_quantum_2024,
   title={Quantum Circuit Discovery for Fault-Tolerant Logical State Preparation with Reinforcement Learning},
-  author={Zen, Remmy and Olle, Jan and Colmenarez, Luis and Puviani, Matteo and Mueller, Markus and Marquardt, Florian},
-  url = {http://arxiv.org/abs/2402.12345},
-  journal={arXiv preprint arXiv:2402.12345},
+  author={Zen, Remmy and Olle, Jan and Colmenarez, Luis and Puviani, Matteo and M{\"u}ller, Markus and Marquardt, Florian},
+  url = {http://arxiv.org/abs/2402.17761},
+  journal={arXiv preprint arXiv:2402.17761},
   urldate = {2024-02-27},
   publisher = {arXiv},
   month = feb,
   year = {2024},
-  note = {arXiv:2402.12345 [quant-ph]},
+  note = {arXiv:2402.17761 [quant-ph]},
 }
 ```
 
