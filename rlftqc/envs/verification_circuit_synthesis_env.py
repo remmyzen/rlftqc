@@ -29,7 +29,32 @@ class EnvParams:
     max_steps: int = 10
 
 class VerificationCircuitSynthesisEnv(environment.Environment):
-    """Environment for the verification circuit synthesis task."""
+    """Environment for the verification circuit synthesis task.
+
+    Args:
+        encoding_circuit: The logical state preparation circuit in Stim (stim.Circuit) or Qiskit (qiskit.circuit.QuantumCircuit).
+        num_ancillas (int, optional): The number of flag qubits in the verification circuit. Default: 1.
+        distance (int, optional): The distance of the code of the logical state. Currently only supports distance 3.
+        gates (list(CliffordGates), optional): List of clifford gates to prepare the verification circuit. Default: H, CX, CZ. 
+        graph (list(tuple), optional): Graph of the qubit connectivity. Default: all-to-all qubit connectivity.
+        max_steps (int, optional): The number of maximum gates to be applied in the circuit. Default: 10
+        threshold (float, optional): The complementary distance threshold to indicates success. Default: 0.99
+        mul_errors_with_generators (boolean, optional): If set to true will multiply errors with the generators to reduce the weight. Default: True.
+        mul_errors_with_S (boolean, optional): If set to true will multiply errors with the S to reduce the weight. Default: False. Useful for non-CSS codes but will generate S which is exponential.
+        ignore_x_errors (boolean, optional): If set to true will ignore any x errors. Useful for preparing |+> or |-> of CSS codes. Default: false.
+        ignore_y_errors (boolean, optional): If set to true will ignore any y errors. Useful for preparing |+i> or |-i> of CSS codes. Default: false.
+        ignore_z_errors (boolean, optional): If set to true will ignore any z errors. Useful for preparing |0> or |1> of CSS codes. Default: false.
+        weight_distance (float, optional): The weight of the distance reward (\mu_d in the paper). Default: 1..
+        weight_flag (float, optional): The weight of the flag reward, (\mu_f in the paper). Default: number of qubits.
+        weight_ancillas (float, optional): The weight of the product ancilla reward, (\mu_p in the paper). Default: number_of_qubits // 2.
+        ancilla_target_only (boolean, optional): If set to True, ancilla is only going to be the target of cnot and not control (sometimes useful for faster convergence). Default: False.
+        ancilla_control_only (boolean, optional): If set to True, ancilla is only going to be the control of cnot and not target (sometimes useful for faster convergence). Default: False.
+        gates_between_ancilla (boolean, optional): If set to True, this allows two qubit gates between ancillas. Default: True.
+        gates_between_data (boolean, optional): If set to True, this allows one and two qubit gates in the data qubits. Default: False.
+        group_ancillas (boolean, optional): If set to True, this will group ancilla into two. Useful to replicate the protocol in Chamberland and Chao original paper. For example: If there are 4 flag qubits, there will be no two-qubit gates between flag qubits 1,2 and 3,4. 
+        plus_ancilla_position (list(int), optional): Initialize flag qubits given in the list as plus state and will measure in the X basis.
+            This is useful for non-CSS codes.
+    """
     
     def __init__(self,
         encoding_circuit,
@@ -55,30 +80,6 @@ class VerificationCircuitSynthesisEnv(environment.Environment):
         plus_ancilla_position = []
         ):
         """Initialize a verification circuit synthesis environment.
-
-        Args:
-            encoding_circuit: The logical state preparation circuit in Stim (stim.Circuit) or Qiskit (qiskit.circuit.QuantumCircuit).
-            num_ancillas (int, optional): The number of flag qubits in the verification circuit. Default: 1.
-            distance (int, optional): The distance of the code of the logical state. Currently only supports distance 3.
-            gates (list(CliffordGates), optional): List of clifford gates to prepare the verification circuit. Default: H, CX, CZ. 
-            graph (list(tuple), optional): Graph of the qubit connectivity. Default: all-to-all qubit connectivity.
-            max_steps (int, optional): The number of maximum gates to be applied in the circuit. Default: 10
-            threshold (float, optional): The complementary distance threshold to indicates success. Default: 0.99
-            mul_errors_with_generators (boolean, optional): If set to true will multiply errors with the generators to reduce the weight. Default: True.
-            mul_errors_with_S (boolean, optional): If set to true will multiply errors with the S to reduce the weight. Default: False. Useful for non-CSS codes but will generate S which is exponential.
-            ignore_x_errors (boolean, optional): If set to true will ignore any x errors. Useful for preparing |+> or |-> of CSS codes. Default: false.
-            ignore_y_errors (boolean, optional): If set to true will ignore any y errors. Useful for preparing |+i> or |-i> of CSS codes. Default: false.
-            ignore_z_errors (boolean, optional): If set to true will ignore any z errors. Useful for preparing |0> or |1> of CSS codes. Default: false.
-            weight_distance (float, optional): The weight of the distance reward (\mu_d in the paper). Default: 1..
-            weight_flag (float, optional): The weight of the flag reward, (\mu_f in the paper). Default: number of qubits.
-            weight_ancillas (float, optional): The weight of the product ancilla reward, (\mu_p in the paper). Default: number_of_qubits // 2.
-            ancilla_target_only (boolean, optional): If set to True, ancilla is only going to be the target of cnot and not control (sometimes useful for faster convergence). Default: False.
-            ancilla_control_only (boolean, optional): If set to True, ancilla is only going to be the control of cnot and not target (sometimes useful for faster convergence). Default: False.
-            gates_between_ancilla (boolean, optional): If set to True, this allows two qubit gates between ancillas. Default: True.
-            gates_between_data (boolean, optional): If set to True, this allows one and two qubit gates in the data qubits. Default: False.
-            group_ancillas (boolean, optional): If set to True, this will group ancilla into two. Useful to replicate the protocol in Chamberland and Chao original paper. For example: If there are 4 flag qubits, there will be no two-qubit gates between flag qubits 1,2 and 3,4. 
-            plus_ancilla_position (list(int), optional): Initialize flag qubits given in the list as plus state and will measure in the X basis.
-                This is useful for non-CSS codes.
         """
         super().__init__()
     
@@ -210,6 +211,9 @@ class VerificationCircuitSynthesisEnv(environment.Environment):
         Args:
             stim_tableau: The input stim Tableau
             num_ancillas (int, optional): number of ancillas. Default: 0
+
+        Returns:
+            Check matrix and its signs in numpy format.
         '''
 
         check_mat_list = stim_tableau.to_numpy() 
@@ -519,8 +523,7 @@ class VerificationCircuitSynthesisEnv(environment.Environment):
         return propagated_error
 
     def count_flagged_errors(self, propagated_error):
-
-        """ Count flagged errors that will return f_t.
+        """Count flagged errors that will return f_t.
         
         Args:
             propagated_error: The list of error propagated to count flagged errors.
@@ -569,7 +572,6 @@ class VerificationCircuitSynthesisEnv(environment.Environment):
         
 
         return propagated_errors
-
 
     def jaccard(self, vec1, vec2):
         """ Compute jaccard distance of the tableau for the reward.
@@ -678,8 +680,14 @@ class VerificationCircuitSynthesisEnv(environment.Environment):
         return jnp.sum(multiply,1) % 4
 
     def canonical_stabilizers(self, check_matrix, sign):
-        '''
-        Gaussian elimination to get canonical stabilizers
+        ''' Gaussian elimination to get canonical stabilizers
+
+        Args: 
+            check_matrix: Check matrix of the current tableau.
+            sign: sign of the current tableau
+
+        Returns:
+            Canonical tableau and its sign
         
         '''
         num_qubits = check_matrix.shape[0]
@@ -807,7 +815,6 @@ class VerificationCircuitSynthesisEnv(environment.Environment):
             {"discount": self.discount(state, params)},
         )
 
-
     def reset_env(self, key: chex.PRNGKey, params: EnvParams) -> Tuple[chex.Array, EnvState]:
         """Performs resetting of environment.
 
@@ -846,6 +853,7 @@ class VerificationCircuitSynthesisEnv(environment.Environment):
     
     def is_terminal(self, state: EnvState, params=None) -> bool:
         """Check whether state is terminal.
+        
         Args:
             state: The state.
             params: The parameters.

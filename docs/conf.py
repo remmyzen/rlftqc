@@ -20,12 +20,16 @@ author = 'Remmy Zen'
 extensions = ['sphinx.ext.napoleon',
         "sphinx.ext.autodoc",
         "nbsphinx",
+        'sphinx.ext.viewcode'
+
 ]
 
 templates_path = ['_templates']
 exclude_patterns = ['_build', 'Thumbs.db', '.DS_Store']
 
-napoleon_google_docstring = False
+napoleon_google_docstring = True
+napoleon_use_param = True
+napoleon_use_ivar = True
 
 nbsphinx_allow_errors = True
 nbsphinx_execute = 'never'

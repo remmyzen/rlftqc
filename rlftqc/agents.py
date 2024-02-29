@@ -15,6 +15,8 @@ The code is taken from PureJaxRL library: https://github.com/luchris429/purejaxr
 
 class Transition(NamedTuple):
     """ Transition named tuple.
+
+    Taken from PureJaxRL library: https://github.com/luchris429/purejaxrl
     """
     done: jnp.ndarray
     action: jnp.ndarray
@@ -27,6 +29,8 @@ class Transition(NamedTuple):
 
 class ActorCritic(nn.Module):
     """ Actor Critic networks for the RL agents.
+
+    Taken from PureJaxRL library: https://github.com/luchris429/purejaxrl
     """
     action_dim: Sequence[int]
     activation: str = "relu"
@@ -75,7 +79,10 @@ def make_train(config, env, env_params = None):
         env: the environment for training
         env_params: parameters of the environments.
 
+    Returns:
+        Training function.
     """
+
     config["NUM_UPDATES"] = (
         config["TOTAL_TIMESTEPS"] // config["NUM_STEPS"] // config["NUM_ENVS"]
     )

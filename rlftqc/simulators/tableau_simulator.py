@@ -2,6 +2,12 @@ import jax.numpy as jnp
 
 class TableauSimulator():
     """ A tableau simulator of batches Clifford circuits in parallel in Jax. 
+
+    Args:
+        n (int): Number of qubits.
+        batch_size (int): Number of parallel circuits to simulate. Default: 1.
+        initial_tableau (optional): Initial tableau in case one does not want to start from scratch. 
+        initial_sign (optional): Initial sign of the tableau in case one does not want to start from scratch.
     """
     
     def __init__(self,
@@ -10,11 +16,6 @@ class TableauSimulator():
                  initial_tableau = None,
                  initial_sign = None):
         """ Initialized a tableau simulator.
-        Args:
-            n (int): Number of qubits.
-            batch_size (int): Number of parallel circuits to simulate. Default: 1.
-            initial_tableau (optional): Initial tableau in case one does not want to start from scratch. 
-            initial_sign (optional): Initial sign of the tableau in case one does not want to start from scratch.
         """
         
         self.n = n

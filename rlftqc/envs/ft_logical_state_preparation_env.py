@@ -28,7 +28,34 @@ class EnvParams:
     max_steps: int = 50
 
 class FTLogicalStatePreparationEnv(environment.Environment):
-    """Environment for the integrated fault-tolerant logical state preparation task."""
+    """Environment for the integrated fault-tolerant logical state preparation task.
+        
+    Args:
+        target (list(str)): List of stabilizers of the target state as a string.
+        num_ancillas (int, optional): The number of flag qubits in the verification circuit. Default: 1.
+        distance (int, optional): The distance of the code of the logical state. Currently only supports distance 3.
+        gates (list(CliffordGates), optional): List of clifford gates to prepare the verification circuit. Default: H, CX, CZ. 
+        graph (list(tuple), optional): Graph of the qubit connectivity. Default: all-to-all qubit connectivity.
+        max_steps (int, optional): The number of maximum gates to be applied in the circuit. Default: 10
+        threshold (float, optional): The complementary distance threshold to indicates success. Default: 0.99
+        mul_errors_with_generators (boolean, optional): If set to true will multiply errors with the generators to reduce the weight. Default: True.
+        mul_errors_with_S (boolean, optional): If set to true will multiply errors with the S to reduce the weight. Default: False. Useful for non-CSS codes but will generate S which is exponential.
+        ignore_x_errors (boolean, optional): If set to true will ignore any x errors. Useful for preparing |+> or |-> of CSS codes. Default: false.
+        ignore_y_errors (boolean, optional): If set to true will ignore any y errors. Useful for preparing |+i> or |-i> of CSS codes. Default: false.
+        ignore_z_errors (boolean, optional): If set to true will ignore any z errors. Useful for preparing |0> or |1> of CSS codes. Default: false.
+        weight_distance (float, optional): The weight of the distance reward (\mu_d in the paper). Default: 1..
+        weight_flag (float, optional): The weight of the flag reward, (\mu_f in the paper). Default: number of qubits.
+        weight_ancillas (float, optional): The weight of the product ancilla reward, (\mu_p in the paper). Default: number_of_qubits // 2.
+        ancilla_target_only (boolean, optional): If set to True, ancilla is only going to be the target of cnot and not control (sometimes useful for faster convergence). Default: False.
+        ancilla_control_only (boolean, optional): If set to True, ancilla is only going to be the control of cnot and not target (sometimes useful for faster convergence). Default: False.
+        gates_between_ancilla (boolean, optional): If set to True, this allows two qubit gates between ancillas. Default: True.
+        group_ancillas (boolean, optional): If set to True, this will group ancilla into two. Useful to replicate the protocol in Chamberland and Chao original paper. For example: If there are 4 flag qubits, there will be no two-qubit gates between flag qubits 1,2 and 3,4. 
+        plus_ancilla_position (list(int), optional): Initialize flag qubits given in the list as plus state and will measure in the X basis.
+            This is useful for non-CSS codes.
+        cz_ancilla_only, boolean, optional): If true, then CZ only applied in the ancilla. (Default: False)
+        distance_metric (str, optional): Distance metric to use for the complementary distance reward.
+            Currently only support 'hamming' or 'jaccard' (default).
+    """
 
     def __init__(self,
             target,
@@ -55,32 +82,6 @@ class FTLogicalStatePreparationEnv(environment.Environment):
             distance_metric = 'jaccard'
         ):
         """ Initialize a integrated fault-tolerant logical state preparation environment.
-        
-        Args:
-            target (list(str)): List of stabilizers of the target state as a string.
-            num_ancillas (int, optional): The number of flag qubits in the verification circuit. Default: 1.
-            distance (int, optional): The distance of the code of the logical state. Currently only supports distance 3.
-            gates (list(CliffordGates), optional): List of clifford gates to prepare the verification circuit. Default: H, CX, CZ. 
-            graph (list(tuple), optional): Graph of the qubit connectivity. Default: all-to-all qubit connectivity.
-            max_steps (int, optional): The number of maximum gates to be applied in the circuit. Default: 10
-            threshold (float, optional): The complementary distance threshold to indicates success. Default: 0.99
-            mul_errors_with_generators (boolean, optional): If set to true will multiply errors with the generators to reduce the weight. Default: True.
-            mul_errors_with_S (boolean, optional): If set to true will multiply errors with the S to reduce the weight. Default: False. Useful for non-CSS codes but will generate S which is exponential.
-            ignore_x_errors (boolean, optional): If set to true will ignore any x errors. Useful for preparing |+> or |-> of CSS codes. Default: false.
-            ignore_y_errors (boolean, optional): If set to true will ignore any y errors. Useful for preparing |+i> or |-i> of CSS codes. Default: false.
-            ignore_z_errors (boolean, optional): If set to true will ignore any z errors. Useful for preparing |0> or |1> of CSS codes. Default: false.
-            weight_distance (float, optional): The weight of the distance reward (\mu_d in the paper). Default: 1..
-            weight_flag (float, optional): The weight of the flag reward, (\mu_f in the paper). Default: number of qubits.
-            weight_ancillas (float, optional): The weight of the product ancilla reward, (\mu_p in the paper). Default: number_of_qubits // 2.
-            ancilla_target_only (boolean, optional): If set to True, ancilla is only going to be the target of cnot and not control (sometimes useful for faster convergence). Default: False.
-            ancilla_control_only (boolean, optional): If set to True, ancilla is only going to be the control of cnot and not target (sometimes useful for faster convergence). Default: False.
-            gates_between_ancilla (boolean, optional): If set to True, this allows two qubit gates between ancillas. Default: True.
-            group_ancillas (boolean, optional): If set to True, this will group ancilla into two. Useful to replicate the protocol in Chamberland and Chao original paper. For example: If there are 4 flag qubits, there will be no two-qubit gates between flag qubits 1,2 and 3,4. 
-            plus_ancilla_position (list(int), optional): Initialize flag qubits given in the list as plus state and will measure in the X basis.
-                This is useful for non-CSS codes.
-            cz_ancilla_only, boolean, optional): If true, then CZ only applied in the ancilla. (Default: False)
-            distance_metric (str, optional): Distance metric to use for the complementary distance reward.
-                Currently only support 'hamming' or 'jaccard' (default).
         """
         super().__init__()
 
@@ -207,8 +208,10 @@ class FTLogicalStatePreparationEnv(environment.Environment):
 
     def get_observation(self, tableau):
         """ Extract the check matrix for the observation of the RL agent.
+
         Args:
             tableau: check matrix of the tableau.
+
         Return:
             Returns the stabilizer part of the tableau and ignore the destabilizers.
         """   
@@ -237,7 +240,7 @@ class FTLogicalStatePreparationEnv(environment.Environment):
         Args:
             tableau: tableau to be extracted.
 
-        Return:
+        Returns:
             Generators of the tableau.
         """
         check_mat = tableau[self.n_qubits_physical:self.n_qubits_physical + self.n_qubits_physical_encoding].astype(jnp.uint8)
@@ -245,8 +248,10 @@ class FTLogicalStatePreparationEnv(environment.Environment):
         return check_mat
  
     def action_matrix(self) -> chex.Array:
-        '''
-        Generate the possible actions
+        ''' Generate the possible actions
+
+        Returns:
+            Array of action matrices.
         '''
         self.action_matrix = []
         self.action_string = []
@@ -396,9 +401,10 @@ class FTLogicalStatePreparationEnv(environment.Environment):
         ''' Update propagated error by multiplying with generators or S.
 
         Args:
+            tableau: The current tableau.
             propagated_error: The list of error propagated to multiply.
 
-        Return:
+        Returns:
             Updated propagated error after multiplied with the generators or S.
         '''    
         ## Create pauli string for generators   
@@ -478,6 +484,7 @@ class FTLogicalStatePreparationEnv(environment.Environment):
 
         Args:
             tableaus: Input tableaus to check for the ancilla product state.
+            signs: Signs of the current input tableaus.
 
         Returns:
             The product state reward p_t
@@ -627,8 +634,14 @@ class FTLogicalStatePreparationEnv(environment.Environment):
         return jnp.sum(multiply,1) % 4
 
     def canonical_stabilizers(self, check_matrix, sign):
-        '''
-        Gaussian elimination to get canonical stabilizers
+        ''' Gaussian elimination to get canonical stabilizers
+
+        Args: 
+            check_matrix: Check matrix of the current tableau.
+            sign: sign of the current tableau
+
+        Returns:
+            Canonical tableau and its sign
         
         '''
         num_qubits = check_matrix.shape[0]
@@ -678,11 +691,13 @@ class FTLogicalStatePreparationEnv(environment.Environment):
         
     def step_env(self, key: chex.PRNGKey, state: EnvState, action: int, params=None) -> Tuple[chex.Array, EnvState, float, bool, dict]:
         """Performs step transitions in the environment.
+
         Args:
             key: Random key for Jax.
             state: The current state.
             action: The action to be applied.
             params: Parameters.
+
         Returns: 
             new observation, new state, reward, done, information.
         """
@@ -756,6 +771,7 @@ class FTLogicalStatePreparationEnv(environment.Environment):
 
     def get_obs(self, state: EnvState, params: Optional[EnvParams] = EnvParams) -> chex.Array:
         """Applies observation function to state.
+
         Args:
             state: The state.
             params: The parameters.
@@ -768,6 +784,7 @@ class FTLogicalStatePreparationEnv(environment.Environment):
 
     def is_terminal(self, state: EnvState, params=None) -> bool:
         """Check whether state is terminal.
+
         Args:
             state: The state.
             params: The parameters.
@@ -787,7 +804,12 @@ class FTLogicalStatePreparationEnv(environment.Environment):
         return done
 
     def copy(self):
-        """ Copy environment. """
+        """ Copy environment. 
+        
+        Returns:
+            The copy of the environment.
+            
+        """
         return FTLogicalStatePreparationEnv(
             self.target,
             self.num_ancillas, 

@@ -28,6 +28,17 @@ class EnvParams:
 
 class LogicalStatePreparationEnv(environment.Environment):
     """Environment for the logical state preparation task.
+
+    Args:
+        target (list(str)): List of stabilizers of the target state as a string.
+        gates (list(CliffordGates), optional): List of clifford gates to prepare the state. Default: H, S, CX. 
+        graph (list(tuple), optional): Graph of the qubit connectivity. Default: all-to-all qubit connectivity.
+        distance_metric (str, optional): Distance metric to use for the complementary distance reward.
+            Currently only support 'hamming' or 'jaccard' (default).
+        max_steps (int, optional): The number of maximum gates to be applied in the circuit. Default: 50
+        threshold (float, optional): The complementary distance threshold to indicates success. Default: 0.99
+        initialize_plus (list(int), optional): Initialize qubits given in the list as plus state instead of zero state.
+            This is useful for large CSS codes or CZ is used in the gate set.
     """
     def __init__(self,
         target,       
@@ -39,18 +50,6 @@ class LogicalStatePreparationEnv(environment.Environment):
         initialize_plus = []
         ):
         """Initialize a logical state preparation environment.
-
-        Args:
-            target (list(str)): List of stabilizers of the target state as a string.
-            gates (list(CliffordGates), optional): List of clifford gates to prepare the state. Default: H, S, CX. 
-            graph (list(tuple), optional): Graph of the qubit connectivity. Default: all-to-all qubit connectivity.
-            distance_metric (str, optional): Distance metric to use for the complementary distance reward.
-                Currently only support 'hamming' or 'jaccard' (default).
-            max_steps (int, optional): The number of maximum gates to be applied in the circuit. Default: 50
-            threshold (float, optional): The complementary distance threshold to indicates success. Default: 0.99
-            initialize_plus (list(int), optional): Initialize qubits given in the list as plus state instead of zero state.
-                This is useful for large CSS codes or CZ is used in the gate set.
-
         """
         super().__init__()
         self.distance_metric = distance_metric
@@ -112,7 +111,6 @@ class LogicalStatePreparationEnv(environment.Environment):
                     self.graph.append((ii,jj))
                     self.graph.append((jj,ii))
 
-                    self.target_check_matrix_unflatten = jnp.array(self.target_tableau.to_numpy())
 
         ## Get observation shape and actions                                      
         self.obs_shape = self.get_observation(self.initial_tableau.current_tableau[0]).flatten().shape[0] + self.n_qubits_physical ## For the sign
@@ -120,9 +118,11 @@ class LogicalStatePreparationEnv(environment.Environment):
 
     def get_observation(self, tableau):
         """ Extract the check matrix for the observation of the RL agent.
+
         Args:
             tableau: check matrix of the tableau.
-        Return:
+
+        Returns:
             Returns the stabilizer part of the tableau and ignore the destabilizers.
         """   
         check_mat = tableau[self.n_qubits_physical:].astype(jnp.uint8)
@@ -255,9 +255,11 @@ class LogicalStatePreparationEnv(environment.Environment):
     
     def swap_matrix(self, pos1, pos2):
         """ Create swap matrix that swap row of position 1 (pos1) and position 2 (pos2) for gaussian elimination.
+
         Args:
             pos1(int): Position 1
             pos2(int): Position 2
+
         Returns:
             A matrix that applied to the tableau swap row of pos1 and pos2.
         """
@@ -356,11 +358,13 @@ class LogicalStatePreparationEnv(environment.Environment):
         self, key: chex.PRNGKey, state: EnvState, action: int, params: EnvParams
         ) -> Tuple[chex.Array, EnvState, float, bool, dict]:
         """Performs step transitions in the environment.
+
         Args:
             key: Random key for Jax.
             state: The current state.
             action: The action to be applied.
             params: Parameters.
+
         Returns: 
             new observation, new state, reward, done, information.
         """
@@ -390,9 +394,11 @@ class LogicalStatePreparationEnv(environment.Environment):
         self, key: chex.PRNGKey, params: EnvParams
     ) -> Tuple[chex.Array, EnvState]:
         """Performs resetting of environment.
+
         Args:
             key: Random key for Jax.
             params: Parameters.
+
         Returns: 
             observation, state.
         """
@@ -414,6 +420,7 @@ class LogicalStatePreparationEnv(environment.Environment):
 
     def is_terminal(self, state: EnvState, params: EnvParams) -> bool:
         """Check whether state is terminal.
+        
         Args:
             state: The state.
             params: The parameters.
@@ -433,11 +440,12 @@ class LogicalStatePreparationEnv(environment.Environment):
 
     def get_obs(self, state: EnvState, params: Optional[EnvParams] = EnvParams) -> chex.Array:
         """Applies observation function to state.
+
         Args:
             state: The state.
             params: The parameters.
         
-        Return:
+        Returns:
             Observations by appending the tableau and the sign
         """
         obs_tab, obs_sign = self.canonical_stabilizers(self.get_observation(state.tableau), state.sign[self.n_qubits_physical:] * 2)
@@ -486,7 +494,7 @@ class LogicalStatePreparationEnv(environment.Environment):
 
     @property
     def default_params(self) -> EnvParams:
-        # Default environment parameters for CodeSynthesis-v0
+        """ Default environment parameters. """
         return EnvParams()
 
 

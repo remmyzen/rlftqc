@@ -10,19 +10,19 @@ class PauliString:
     collection of qubits.
 
     No sign or phase for now.
+
+    1. __init__(self, num_qubits: int, batch_size: int = 1) 
+        Initialize IIII...I paulis with the size of batch_size.
+
+    2. __init__(self, pauli_string: arr[str]) 
+        Pauli String from arr of string.
+
+    3. __init__(self) 
+        Empty pauli string
     '''
 
     def __init__(self, *args):
-        '''
-            1. __init__(self, num_qubits: int, batch_size: int = 1) 
-                Initialize IIII...I paulis with the size of batch_size.
-
-            2. __init__(self, pauli_string: arr[str]) 
-                Pauli String from arr of string.
-
-            3. __init__(self) 
-                Empty pauli string
-        
+        ''' Initialize PauliString class.       
         '''
 
         if len(args) == 0:
@@ -52,8 +52,7 @@ class PauliString:
 
           
     def _string_to_index_matrix(self, strings):  
-        '''
-        Convert strings of pauli to index matrix where I = 0, X = 2, Y = 3, Z = 1
+        ''' Convert strings of pauli to index matrix where I = 0, X = 2, Y = 3, Z = 1
         Examples:
             ['XYZI', 'IIYX'] -> [[1,2,3,0], [0,0,2,1]]
         '''
@@ -142,8 +141,10 @@ class PauliString:
         return check_matrix
     
     def copy(self):
-        '''
-        Copy PauliString
+        '''Copy PauliString.
+
+        Returns:
+            A copy of the PauliString.
         '''
         new_pauli = PauliString()
         new_pauli.index_matrix = jnp.copy(self.index_matrix)
@@ -154,8 +155,14 @@ class PauliString:
 
 
     def update_pauli(self, another_pauli_string, position):
-        '''
-        Update pauli at the current position with another pauli string since Jax cannot handle dynamic array.
+        '''Update pauli at the current position with another pauli string since Jax cannot handle dynamic array.
+
+        Args:
+            another_pauli_string: Update current pauli with another pauli string at the given position.
+            position: The position of pauli to update.
+        
+        Returns:
+            Update Pauli String.
         '''
         self.check_matrix = jax.lax.dynamic_update_slice(self.check_matrix, another_pauli_string.check_matrix, (position,0))
         self.index_matrix = jax.lax.dynamic_update_slice(self.index_matrix, another_pauli_string.index_matrix, (position,0))
@@ -165,9 +172,14 @@ class PauliString:
         return self
 
     def append(self, another_pauli_string):
-        '''
-        Append another pauli string
-        '''
+        """ Append another pauli string.
+
+        Args:
+            another_pauli_string (_type_): Another pauli string to append.
+
+        Returns:
+            Appended Pauli String.
+        """
         # stack the matrix
         self.index_matrix = jnp.vstack((self.index_matrix, another_pauli_string.index_matrix))
         self.check_matrix = jnp.vstack((self.check_matrix, another_pauli_string.check_matrix))
@@ -184,15 +196,28 @@ class PauliString:
 
     
     def insert_ancilla(self, num_ancillas):
+        """Insert ancilla to the current tableau.
+
+        Args:
+            num_ancillas (int): number of ancillas to be inserted
+
+        Returns:
+            PauliString with inserted ancilla.
+        """
         self.check_matrix = jnp.c_[self.check_matrix[:,:self.num_qubits], jnp.zeros((self.batch_size, num_ancillas)), self.check_matrix[:,self.num_qubits:], jnp.zeros((self.batch_size, num_ancillas))]
         self.index_matrix = jnp.c_[self.index_matrix, jnp.zeros((self.batch_size, num_ancillas))]
         self.num_qubits += self.num_ancillas
         return self
 
     def append_check_matrix(self, another_check_matrix):
-        '''
-        Append another pauli string
-        '''
+        """ Append another pauli string
+
+        Args:
+            another_check_matrix: Append another check matrix to the current PauliString.
+
+        Returns:
+            Appended PauliString.
+        """
         # stack the matrix
         self.check_matrix = jnp.vstack((self.check_matrix, another_check_matrix))
         self.index_matrix = self._check_to_index_matrix(self.check_matrix)
@@ -201,16 +226,20 @@ class PauliString:
         # self.index_matrix = jnp.unique(self.index_matrix, axis=0)
         # self.check_matrix = jnp.unique(self.check_matrix, axis=0)
 
-
         # update batch size
         self.batch_size = self.index_matrix.shape[0]
 
         return self
     
     def after(self, gate):
-        '''
-        Update pauli after applying gate
-        '''
+        """ Update pauli after applying gate
+
+        Args:
+            gate: Gate represented as a unitary to apply
+
+        Returns:
+            Updated PauliString after applying the gate
+        """
         # multiply with gate from the right
         self.check_matrix = jnp.matmul(self.check_matrix, gate) % 2
         # update the index matrix
@@ -226,6 +255,18 @@ class PauliString:
         return self
     
     def weight(self, index_matrix, index=None, ignore_x=False, ignore_y=False, ignore_z=False):
+        """Count the weight of a given index matrix.
+
+        Args:
+            index_matrix : Index matrix of the PauliString
+            index (list(int), optional): The index to check weight. Defaults to None.
+            ignore_x (bool, optional): Ignore X pauli in the counting. Defaults to False.
+            ignore_y (bool, optional): Ignore Y pauli in the counting. Defaults to False.
+            ignore_z (bool, optional): Ignore Z pauli in the counting. Defaults to False.
+
+        Returns:
+            int: Weight of the given index matrix.
+        """
         if index is None:
             if ignore_x:
                 return jnp.sum(index_matrix == 1, axis = 1) + jnp.sum(index_matrix == 3, axis = 1)
@@ -246,6 +287,18 @@ class PauliString:
                 return jnp.count_nonzero(index_matrix[:,index], axis=1)
     
     def weight_3d(self, index_matrix, index=None, ignore_x=False, ignore_y=False, ignore_z=False):
+        """Count the weight of a given index matrix for 3D index matrix.
+
+        Args:
+            index_matrix : Index matrix of the PauliString
+            index (list(int), optional): The index to check weight. Defaults to None.
+            ignore_x (bool, optional): Ignore X pauli in the counting. Defaults to False.
+            ignore_y (bool, optional): Ignore Y pauli in the counting. Defaults to False.
+            ignore_z (bool, optional): Ignore Z pauli in the counting. Defaults to False.
+
+        Returns:
+            int: Weight of the given index matrix.
+        """
         if index is None:
             if ignore_x:
                 return jnp.sum(index_matrix == 1, axis = 2) + jnp.sum(index_matrix == 3, axis = 2)
@@ -267,15 +320,31 @@ class PauliString:
 
 
     def get_weight(self, index=None, ignore_x=False, ignore_y=False, ignore_z=False):
-        ''' 
-        count the weight of the pauli
-        '''
+        """Count the weight of current PauliString.
+
+        Args:
+            index (list(int), optional): The index to check weight. Defaults to None.
+            ignore_x (bool, optional): Ignore X pauli in the counting. Defaults to False.
+            ignore_y (bool, optional): Ignore Y pauli in the counting. Defaults to False.
+            ignore_z (bool, optional): Ignore Z pauli in the counting. Defaults to False.
+
+        Returns:
+            int: Weight of the current PauliString.
+        """
         return self.weight(self.index_matrix, index, ignore_x, ignore_y, ignore_z)
 
     def get_inverse_weight(self, index=None, include_x = False, include_y = False, include_z=False):
-        ''' 
-        count the inverse weight of the pauli (count only I or Z if include_z is True)
-        '''
+        """Count the inverse weight of current PauliString.
+
+        Args:
+            index (list(int), optional): The index to check weight. Defaults to None.
+            include_x (bool, optional): Include X pauli in the counting. Defaults to False.
+            include_y (bool, optional): Include Y pauli in the counting. Defaults to False.
+            include_z (bool, optional): Include Z pauli in the counting. Defaults to False.
+
+        Returns:
+            int: Inverse weight of the current PauliString.
+        """
         if index is None:
             if include_z:
                 return jnp.sum(self.index_matrix == 0, axis = 1) + jnp.sum(self.index_matrix == 1, axis = 1)
@@ -296,8 +365,10 @@ class PauliString:
                 return jnp.sum(self.index_matrix[:,index] == 0, axis = 1)
 
     def generate_stabilizer_group(self):
-        '''
-        Generate stabilizer group of the Pauli Strings.
+        '''Generate stabilizer group of the Pauli Strings.
+
+        Returns:
+            Generate S by multiplying each PauliStrings.
         '''
         ## Generate powerset for all rows of the check matrix
         powerset = list(more_itertools.powerset(self.check_matrix))[1:]
@@ -308,15 +379,16 @@ class PauliString:
         return PauliString().from_numpy(new_check_matrix)
     
     def multiply_each(self):
-        '''
-        multiply with itself (use to generate combination of two qubit errors)
+        ''' Multiply PauliString with itself (use to generate combination of two qubit errors)
         TODO: still very inefficient
+
+        Returns:
+            PauliString after multiplied each.
         '''
         import itertools
         check_matrix_new = []
         combinations = list(itertools.combinations(range(self.batch_size), 2))
         len_comb = len(combinations)
-        print(len_comb)
         for ii, combs in enumerate(combinations):
             check_matrix_new.append((self.check_matrix[combs[0]] + self.check_matrix[combs[1]]) % 2)
         
@@ -327,8 +399,13 @@ class PauliString:
 
 
     def multiply(self, pauli):
-        '''
-        multiply with other paulis(use to generate combination of two qubit errors)
+        ''' Multiply with other paulis(use to generate combination of two qubit errors)
+
+        Args:
+            pauli: Another PauliString to multiply.
+        
+        Returns:
+            PauliString after multiplied.
         '''
         ## Expand dimension to enable summation
         current_check_matrix = jnp.expand_dims(self.check_matrix, 1)
@@ -352,8 +429,19 @@ class PauliString:
         return self
             
     def multiply_and_update(self, pauli, num_ancillas, ignore_z, ignore_x=False, ignore_y = False):
+        """ Multiply with other paulis and update to smallest weight (use to multiply by generators)
+
+        Args:
+            pauli (PauliString): the other PauliString.
+            num_ancillas (int): number of ancillas.
+            ignore_z (bool): Ignore Pauli Z.
+            ignore_x (bool, optional): Ignore Pauli X. Defaults to False.
+            ignore_y (bool, optional): Ignore Pauli Y. Defaults to False.
+
+        Returns:
+            _type_: _description_
+        """
         '''
-        multiply with other paulis and update to smallest weight (use to multiply by generators)
         '''
         ## Expand dimension to enable summation
         current_check_matrix = jnp.expand_dims(self.check_matrix, 1)
@@ -398,6 +486,16 @@ class PauliString:
         return self
     
     def get_unique(self, size):
+        """ Get unique PauliString.
+
+        NOTE: Does not work with JIT.
+
+        Args:
+            size (int): fixed size of the PauliString
+
+        Returns:
+            Pauli with Unique elements.
+        """
         new_pauli = PauliString()
         new_pauli.index_matrix = jnp.unique(self.index_matrix, axis = 0, size=size)
         new_pauli.num_qubits = self.num_qubits
@@ -407,9 +505,13 @@ class PauliString:
         
 
     def remove_duplicate(self):
-        '''
-        Remove duplicated error, can only be done in non-jitted way.
-        '''
+        """Remove duplicated Paulis.
+         
+        NOTE: can only be done in non-jitted way.
+
+        Returns:
+            Paulis with only unique elements.
+        """
         self.index_matrix = jnp.unique(self.index_matrix, axis=0)
         self.check_matrix = jnp.unique(self.check_matrix, axis=0)
 
@@ -419,14 +521,21 @@ class PauliString:
         return self
         
     def to_numpy(self):
-        '''
-        Return the check matrix
+        '''Return the check matrix.
+
+        Returns:
+            Get the check matrix or tableau.
         '''
         return self.check_matrix
     
     def from_numpy(self, check_matrix):
-        '''
-        Construct tableau from a given check matrix
+        '''Construct tableau from a given check matrix
+
+        Args:
+            check_matrix: Check matrix to construct the PauliString
+        
+        Returns: 
+            PauliString constructed from the given `check_matrix`
         '''
         self.check_matrix = check_matrix
 
@@ -438,27 +547,26 @@ class PauliString:
         return self
     
     def get_pauli_strings(self):
-        '''
-        Get list of pauli strings
+        '''Get list of pauli strings.
+
+        Returns:
+            list(str): List of PauliStrings
         '''
         return self._index_matrix_to_strings(self.index_matrix)
 
     def __getitem__(self, index_or_slice: int): 
-        '''
-        Access pauli according to index or slice
+        ''' Access pauli according to index or slice.
         '''
         return self.index_matrix[index_or_slice]
 
     def __str__(self):
-        '''
-        Text representation
+        '''Text representation.
         '''
         string = self._index_matrix_to_strings(self.index_matrix)
         return ','.join(["'%s'" % s for s in string])
 
     def __iter__(self):
-        '''
-        Iterate through all Paulis
+        '''Iterate through all Paulis.
         '''
         return PauliStringIterator(self)
     

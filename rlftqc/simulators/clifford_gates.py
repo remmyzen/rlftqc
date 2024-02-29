@@ -3,16 +3,22 @@ import jax.numpy as jnp
 class CliffordGates():
     """ Clifford gates class that consists of Clifford gates to update tableau.
     Currently only support the following gates: H, S, X, SQRT_X, CX, and CZ.
+
+    Args:
+        n (int): Number of qubits
     """
     
     def __init__(self, n):
-        
+        """Initialize CliffordGates object.
+        """
         self.n = n # Number of qubits
 
     def h(self, i):
         """ Hadamard gate.
+
         Args:
             i (int): The qubit position.
+
         Returns:
             The operator to update tableau and the sign operator to update the sign
         """
@@ -46,8 +52,10 @@ class CliffordGates():
 
     def s(self,i):
         """ Phase gate.
+
         Args:
             i (int): The qubit position.
+
         Returns:
             The operator to update tableau and the sign operator to update the sign
         """
@@ -77,8 +85,10 @@ class CliffordGates():
 
     def x(self,i):
         """ X gate.
+
         Args:
             i (int): The qubit position.
+
         Returns:
             The operator to update tableau and the sign operator to update the sign
         """
@@ -111,8 +121,10 @@ class CliffordGates():
 
     def sqrt_x(self,i):
         """ Square root of x gate.
+
         Args:
             i (int): The qubit position.
+
         Returns:
             The operator to update tableau and the sign operator to update the sign
         """
@@ -153,9 +165,11 @@ class CliffordGates():
         
     def cx(self, control, target):
         """ CNOT or CX gate.
+
         Args:
             control (int): The control qubit position.
             target (int): The target qubit position.
+
         Returns:
             The operator to update tableau and the sign operator to update the sign
         """
@@ -194,9 +208,11 @@ class CliffordGates():
     
     def cz(self, control, target):
         """ CZ gate.
+
         Args:
             control (int): The control qubit position.
             target (int): The target qubit position.
+            
         Returns:
             The operator to update tableau and the sign operator to update the sign
         """

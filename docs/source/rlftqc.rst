@@ -21,6 +21,22 @@ rlftqc.agents module
    :undoc-members:
    :show-inheritance:
 
+rlftqc.devices module
+---------------------
+
+.. automodule:: rlftqc.devices
+   :members:
+   :undoc-members:
+   :show-inheritance:
+
+rlftqc.ft\_logical\_state\_preparation module
+---------------------------------------------
+
+.. automodule:: rlftqc.ft_logical_state_preparation
+   :members:
+   :undoc-members:
+   :show-inheritance:
+
 rlftqc.logical\_state\_preparation module
 -----------------------------------------
 
@@ -33,6 +49,14 @@ rlftqc.utils module
 -------------------
 
 .. automodule:: rlftqc.utils
+   :members:
+   :undoc-members:
+   :show-inheritance:
+
+rlftqc.verification\_circuit\_synthesis module
+----------------------------------------------
+
+.. automodule:: rlftqc.verification_circuit_synthesis
    :members:
    :undoc-members:
    :show-inheritance:

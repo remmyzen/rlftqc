@@ -5,6 +5,7 @@ from rlftqc.simulators import CliffordGates
 import cirq_google as cg
 
 class Devices(metaclass=abc.ABCMeta):
+    """Abstract class for different devices. """
     @property
     @abc.abstractmethod
     def num_qubits(self):
@@ -19,16 +20,18 @@ class Devices(metaclass=abc.ABCMeta):
         """ Return the available gateset from this device. 
         
         Returns:
-            List of available gates as a list of functions from CliffordGates classes.
+            List of available gates as a list of functions from CliffordGates.
+            
         """
 
     @abc.abstractmethod
     def get_connectivity(self, qubits_index=None, directed=True):
-        """ Return the connectivity of the devices. 
-        
+        """Return the connectivity of the devices. 
+
         Args:
-            qubits_index (optional, list(int)): The index of qubits to take the connectivity. Useful for taking subsets of qubits. Default: None
-            directed (optional): Whether the graph is directed or not. Set to false if the two-qubit gates are symmetric (e.g. CZ). Default: True.
+            qubits_index (list(int), optional): The index of the qubit as a subset. Default: None.
+            directed (bool, optional): Whether the edge is directed or not. For symmetric two-qubit gates (e.g. CZ gate) this should be `False`. Default: True.
+
         Returns:
             Edge lists of the connectivity.
         
@@ -79,7 +82,7 @@ class IonTrap(Devices):
         Note: Ion Trap should have Molmer-Sorensen gate but it is not yet implemented it returns CX for now.
 
         Returns:
-            [CX, H and S] gates
+            List of gates from CliffordGates: [CX, H and S] gates
 
         """
         return [self.gates.cx, self.gates.h, self.gates.s]
@@ -124,12 +127,13 @@ class IonTrap(Devices):
 class IBM(Devices):
     ''' IBM Quantum devices connectivity.
     See the list of supported devices: https://docs.quantum.ibm.com/api/qiskit/0.46/providers_fake_provider#fake-v2-backends
+
+    Args:
+        name: Name of the device, see the link above.
+
     '''
     def __init__ (self, name):
         """ Initialize an IBM Quantum device.
-
-        Args:
-            name: Name of the device.
         """
         try:
             self.device_ = eval("Fake%sV2()" % name.title())
@@ -152,8 +156,7 @@ class IBM(Devices):
 
     @property
     def num_qubits(self):
-        """
-        Define the number of qubits available on the devices.
+        """ Define the number of qubits available on the devices.
 
         Returns:
             The number of qubits in the device.
@@ -169,7 +172,7 @@ class IBM(Devices):
         S = Rz(\pi / 2)
 
         Returns:
-            [CX, X, SQRT_X, S]
+            List of functions from CliffordGates: [CX, X, SQRT_X, S]
         """
         return [self.gates.cx, self.gates.x, self.gates.s, self.gates.sqrt_x]
            
@@ -242,6 +245,9 @@ class Sycamore(Devices):
 
         S = U3(\pi/2, 0, \pi)
         H = U3(0,0, \pi / 2)
+
+        Returns:
+            List of functions from CliffordGates: [CZ, H, S]
         """
         return [self.gates.cz, self.gates.h, self.gates.s]
 
@@ -249,8 +255,13 @@ class Sycamore(Devices):
     def get_connectivity(self, qubits_index=None, directed=False):
         """
         Return the connectivity of the devices.
-        qubits_index: give qubit index to get the subset of the connectivity
-        directed: True for directed graph and False for undirected graph (in case of symmetric two-qubit gates e.g. CZ)
+        
+        Args:
+            qubits_index: give qubit index to get the subset of the connectivity
+            directed: True for directed graph and False for undirected graph (in case of symmetric two-qubit gates e.g. CZ)
+
+        Returns:
+            Edge lists of the connectivity.
         """
         if not directed:
             graph_temp = self.graph.to_undirected()
