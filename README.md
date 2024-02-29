@@ -10,6 +10,7 @@ Code repository for quantum circuit discovery for fault-tolerant logical state p
     1. [Logical State Preparation](#logical-state-preparation)   <a href="https://colab.research.google.com/drive/1u2iokg1ZBF6YeB6-UuzmbFqAo_3KlCu-" target="_blank"><img src="https://colab.research.google.com/assets/colab-badge.svg" alt="Open In Colab"/></a>
     2. [Verification Circuit Synthesis](#verification-circuit-synthesis)  <a href="https://colab.research.google.com/drive/1OJJ_DSpO7zUeoBZruXMIpntbWjXylVPf" target="_blank"><img src="https://colab.research.google.com/assets/colab-badge.svg" alt="Open In Colab"/></a>
     3. [Integrated Fault-Tolerant Logical State Preparation](#integrated-fault-tolerant-logical-state-preparation)  <a href="https://colab.research.google.com/drive/1kcq8q0C1jE8J5xSVy19fpsnr0KdPTQwe" target="_blank"><img src="https://colab.research.google.com/assets/colab-badge.svg" alt="Open In Colab"/></a>
+- [Documentations](https://remmyzen.github.io/rlftqc/)
 - [Circuit Examples](#circuit-examples)
 - [License](#license)
 - [Citation](#citation)
