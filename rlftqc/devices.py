@@ -29,8 +29,8 @@ class Devices(metaclass=abc.ABCMeta):
         """Return the connectivity of the devices. 
 
         Args:
-            qubits_index (list(int), optional): The index of the qubit as a subset. Default: None.
-            directed (bool, optional): Whether the edge is directed or not. For symmetric two-qubit gates (e.g. CZ gate) this should be `False`. Default: True.
+            qubits_index(optional, list(int)): The index of qubits to take the connectivity. Useful for taking subsets of qubits. Default: None.
+            directed(optional): Whether the graph is directed or not. Set to false if the two-qubit gates are symmetric (e.g. CZ). Default: True.
 
         Returns:
             Edge lists of the connectivity.
@@ -92,8 +92,8 @@ class IonTrap(Devices):
         """ Return the connectivity of the devices.
 
         Args:
-            qubits_index: give qubit index to get the subset of the connectivity
-            directed: True for directed graph and False for undirected graph (in case of symmetric two-qubit gates e.g. CZ)
+            qubits_index: give qubit index to get the subset of the connectivity.
+            directed: True for directed graph and False for undirected graph (in case of symmetric two-qubit gates e.g. CZ).
         
         Returns:
             The edge list

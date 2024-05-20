@@ -5,7 +5,7 @@ from flax import struct
 import chex
 from inspect import signature
 from typing import Tuple, Optional
-
+import sys
 from rlftqc.simulators import PauliString, TableauSimulator, CliffordGates
 
 
@@ -17,6 +17,7 @@ class EnvState:
     sign: jnp.array
     previous_distance: float
     time: int
+    max_diff: float
     
 @struct.dataclass
 class EnvParams:
@@ -47,14 +48,28 @@ class LogicalStatePreparationEnv(environment.Environment):
         distance_metric = 'jaccard',
         max_steps = 50,
         threshold = 0.99,                 
-        initialize_plus = []
+        initialize_plus = [],
+        use_max_reward = True
         ):
         """Initialize a logical state preparation environment.
+        Args:
+            target (list(str)): List of stabilizers of the target state as a string.
+            gates (list(CliffordGates), optional): List of clifford gates to prepare the state. Default: H, S, CX. 
+            graph (list(tuple), optional): Graph of the qubit connectivity. Default: all-to-all qubit connectivity.
+            distance_metric (str, optional): Distance metric to use for the complementary distance reward.
+                Currently only support 'hamming' or 'jaccard' (default).
+            max_steps (int, optional): The number of maximum gates to be applied in the circuit. Default: 50
+            threshold (float, optional): The complementary distance threshold to indicates success. Default: 0.99
+            initialize_plus (list(int), optional): Initialize qubits given in the list as plus state instead of zero state.
+                This is useful for large CSS codes or CZ is used in the gate set.
+            use_max_reward (boolean, optional): Whether to use MAX RL algorithm.
+
         """
         super().__init__()
         self.distance_metric = distance_metric
         self.max_steps = max_steps
         self.threshold = threshold
+        self.use_max_reward = use_max_reward
 
         ### Process target stabilizers
         self.target = target
@@ -376,19 +391,31 @@ class LogicalStatePreparationEnv(environment.Environment):
 
         ## Compute complementary distance reward
         reward = current_distance - state.previous_distance 
+        new_max_diff = jnp.max(jnp.array([0.0, state.max_diff - reward]))
+        reward_adapted = jnp.max(jnp.array([0.0, reward - state.max_diff]))
 
-        state = EnvState( new_state, new_sign, current_distance, state.time + 1)
+        state = EnvState( new_state, new_sign, current_distance, state.time + 1, new_max_diff)
 
         # Evaluate termination conditions
         done = self.is_terminal(state, params)
+        if self.use_max_reward:
 
-        return (
-            jax.lax.stop_gradient(self.get_obs(state)),
-            jax.lax.stop_gradient(state),
-            reward,
-            done,
-            {"discount": self.discount(state, params)},
-        )
+            return (
+                jax.lax.stop_gradient(self.get_obs(state)),
+                jax.lax.stop_gradient(state),
+                reward_adapted,
+                done,
+                {"discount": self.discount(state, params), "max_reward": reward_adapted},
+            )
+        else:
+            return (
+                jax.lax.stop_gradient(self.get_obs(state)),
+                jax.lax.stop_gradient(state),
+                reward,
+                done,
+                {"discount": self.discount(state, params), "max_reward": reward_adapted},
+            )
+        
 
     def reset_env(
         self, key: chex.PRNGKey, params: EnvParams
@@ -414,7 +441,8 @@ class LogicalStatePreparationEnv(environment.Environment):
             tableau = tableaus,
             sign = signs,            
             previous_distance=self.get_distance(tableaus, signs),
-            time = 0
+            time = 0,
+            max_diff = 0.0,
         )
         return self.get_obs(state), state
 
@@ -449,7 +477,10 @@ class LogicalStatePreparationEnv(environment.Environment):
             Observations by appending the tableau and the sign
         """
         obs_tab, obs_sign = self.canonical_stabilizers(self.get_observation(state.tableau), state.sign[self.n_qubits_physical:] * 2)
-        return jnp.append(obs_tab.flatten(), obs_sign // 2) 
+        if self.use_max_reward:
+            return jnp.append(jnp.append(obs_tab.flatten(), obs_sign // 2), state.max_diff)
+        else:
+            return jnp.append(obs_tab.flatten(), obs_sign // 2) 
   
     def __str__(self):
         '''Text representation.'''
@@ -461,7 +492,7 @@ class LogicalStatePreparationEnv(environment.Environment):
 
     def copy(self):
         """ Copy environment. """
-        return LogicalStatePreparationEnv(self.target, self.gates, self.graph, self.distance_metric, self.max_steps, self.threshold, self.initialize_plus)
+        return LogicalStatePreparationEnv(self.target, self.gates, self.graph, self.distance_metric, self.max_steps, self.threshold, self.initialize_plus, self.use_max_reward)
 
     @property
     def name(self) -> str:
@@ -481,7 +512,11 @@ class LogicalStatePreparationEnv(environment.Environment):
 
     def observation_space(self, params: EnvParams) -> spaces.Box:
         """Observation space of the environment."""
-        return spaces.Box(0, 1, self.obs_shape, dtype=jnp.uint8)
+        if self.use_max_reward:
+            ## Add x for max rl
+            return spaces.Box(0, 1, self.obs_shape + 1, dtype=jnp.uint8)
+        else:
+            return spaces.Box(0, 1, self.obs_shape, dtype=jnp.uint8)
 
     def state_space(self, params: EnvParams) -> spaces.Dict:
         """State space of the environment."""

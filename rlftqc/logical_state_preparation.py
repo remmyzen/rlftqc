@@ -23,6 +23,7 @@ class LogicalStatePreparation:
         max_steps (int, optional): The number of maximum gates to be applied in the circuit. Default: 50
         threshold (float, optional): The complementary distance threshold to indicates success. Default: 0.99
         initialize_plus (list(int), optional): Initialize qubits given in the list as plus state instead of zero state. This is useful for large CSS codes or CZ is used in the gate set.
+        use_max_reward (boolean, optional): Whether to use MAX RL algorithm.
         training_config (optional): Training configuration.
         seed (int, optional): Random seed (default: 42) 
     """
@@ -35,12 +36,13 @@ class LogicalStatePreparation:
         max_steps = 50,
         threshold = 0.99,                 
         initialize_plus = [],
+        use_max_reward = True,
         training_config = None,
         seed = 42):
         """ Initialize a logical state preparation task. """
 
         ## Initialize the environment
-        self.env = LogicalStatePreparationEnv(target, gates, graph, distance_metric, max_steps, threshold, initialize_plus)
+        self.env = LogicalStatePreparationEnv(target, gates, graph, distance_metric, max_steps, threshold, initialize_plus, use_max_reward)
 
         self.seed = seed
 
