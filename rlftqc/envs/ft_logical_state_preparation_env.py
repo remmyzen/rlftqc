@@ -22,7 +22,9 @@ class EnvState:
     previous_product_ancilla: float
     number_of_errors: int
     time: int
-    
+    max_diff: float
+
+
 @struct.dataclass
 class EnvParams:
     max_steps: int = 50
@@ -55,6 +57,8 @@ class FTLogicalStatePreparationEnv(environment.Environment):
         cz_ancilla_only, boolean, optional): If true, then CZ only applied in the ancilla. (Default: False)
         distance_metric (str, optional): Distance metric to use for the complementary distance reward.
             Currently only support 'hamming' or 'jaccard' (default).
+        use_max_reward (boolean, optional): Whether to use MAX RL algorithm.
+
     """
 
     def __init__(self,
@@ -79,7 +83,8 @@ class FTLogicalStatePreparationEnv(environment.Environment):
             group_ancillas = False,  
             cz_ancilla_only = False,
             plus_ancilla_position = [],
-            distance_metric = 'jaccard'
+            distance_metric = 'jaccard',
+            use_max_reward = False
         ):
         """ Initialize a integrated fault-tolerant logical state preparation environment.
         """
@@ -89,6 +94,7 @@ class FTLogicalStatePreparationEnv(environment.Environment):
         self.target = target
         self.target_sign = []
         self.n_qubits_physical_encoding = len(self.target)
+        
         target_wo_sign = []
         for stabs in self.target:
             ## Process sign
@@ -201,6 +207,8 @@ class FTLogicalStatePreparationEnv(environment.Environment):
         # Generate all two qubit errors except II...I
         self.two_qubit_errors = list(itertools.product('IXYZ', repeat=2))[1:]  
         self.initial_propagated_errors = PauliString(self.n_qubits_physical, 15 * self.max_steps)
+
+        self.use_max_reward = use_max_reward
 
         self.actions = self.action_matrix()
 
@@ -717,19 +725,31 @@ class FTLogicalStatePreparationEnv(environment.Environment):
                         self.weight_flag * (current_flagged_errors - state.previous_flagged_errors) +     \
                         self.weight_distance * (current_distance - state.previous_distance)
             
-        state = EnvState(new_state.astype(jnp.uint8), new_sign.astype(jnp.uint8),  new_propagated_error.astype(jnp.uint8), current_flagged_errors, current_distance, current_product_ancilla, new_number_of_errors, state.time + 1)
+        
+        new_max_diff = jnp.max(jnp.array([0.0, state.max_diff - reward]))
+        reward_adapted = jnp.max(jnp.array([0.0, reward - state.max_diff]))
+
+        state = EnvState(new_state.astype(jnp.uint8), new_sign.astype(jnp.uint8),  new_propagated_error.astype(jnp.uint8), current_flagged_errors, current_distance, current_product_ancilla, new_number_of_errors, state.time + 1, new_max_diff)
 
         # Evaluate termination conditions
         done = self.is_terminal(state)
 
-
-        return (
-            jax.lax.stop_gradient(self.get_obs(state)),
-            jax.lax.stop_gradient(state),
-            reward,
-            done,            
-            {"discount": self.discount(state, params)}
-        )
+        if self.use_max_reward:
+            return (
+                jax.lax.stop_gradient(self.get_obs(state)),
+                jax.lax.stop_gradient(state),
+                reward_adapted,
+                done,            
+                {"discount": self.discount(state, params)}
+            )
+        else:
+            return (
+                jax.lax.stop_gradient(self.get_obs(state)),
+                jax.lax.stop_gradient(state),
+                reward,
+                done,            
+                {"discount": self.discount(state, params)}
+            )
 
     def reset_env(self, key: chex.PRNGKey, params: EnvParams) -> Tuple[chex.Array, EnvState]:
         """Performs resetting of environment.
@@ -764,7 +784,8 @@ class FTLogicalStatePreparationEnv(environment.Environment):
             previous_distance=previous_distance,
             previous_product_ancilla=previous_product_ancilla,
             number_of_errors = 0,
-            time = 0
+            time = 0,
+            max_diff = 0.0
         )
 
         return self.get_obs(state), state
@@ -780,8 +801,11 @@ class FTLogicalStatePreparationEnv(environment.Environment):
             Observations by appending the tableau and the sign
         """
         obs_tab, obs_sign = self.canonical_stabilizers(self.get_observation(state.tableau), state.sign[self.n_qubits_physical:] * 2)
-        return jnp.append(obs_tab.flatten(), obs_sign // 2) 
-
+        if self.use_max_reward:
+            return jnp.append(jnp.append(obs_tab.flatten(), obs_sign // 2), state.max_diff)
+        else:
+            return jnp.append(obs_tab.flatten(), obs_sign // 2) 
+        
     def is_terminal(self, state: EnvState, params=None) -> bool:
         """Check whether state is terminal.
 
@@ -832,7 +856,8 @@ class FTLogicalStatePreparationEnv(environment.Environment):
             self.group_ancillas,  
             self.cz_ancilla_only,
             self.plus_ancilla_position,
-            self.distance_metric
+            self.distance_metric,
+            self.use_max_reward
             )
 
     @property
@@ -851,7 +876,11 @@ class FTLogicalStatePreparationEnv(environment.Environment):
 
     def observation_space(self, params: EnvParams) -> spaces.Box:
         """Observation space of the environment."""
-        return spaces.Box(0, 1, self.obs_shape, dtype=jnp.uint8)
+        if self.use_max_reward:
+            ## Add x for max rl
+            return spaces.Box(0, 1, self.obs_shape + 1, dtype=jnp.uint8)
+        else:
+            return spaces.Box(0, 1, self.obs_shape, dtype=jnp.uint8)
 
     def state_space(self, params: EnvParams) -> spaces.Dict:
         """State space of the environment."""

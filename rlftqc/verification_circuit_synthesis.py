@@ -62,7 +62,8 @@ class VerificationCircuitSynthesis:
         gates_between_ancilla = True,
         gates_between_data = False, 
         group_ancillas = False,  
-        plus_ancilla_position = [],  
+        plus_ancilla_position = [], 
+        use_max_reward = False, 
         training_config = None,
         seed = 42):
         """ Initialize a verification circuit synthesis task. """
@@ -91,7 +92,8 @@ class VerificationCircuitSynthesis:
                 gates_between_ancilla,
                 gates_between_data, 
                 group_ancillas,  
-                plus_ancilla_position)
+                plus_ancilla_position,
+                use_max_reward)
         self.seed = seed
 
         ## Get the agent

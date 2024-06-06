@@ -22,6 +22,7 @@ class EnvState:
     previous_distance: float
     number_of_errors: int
     time: int
+    max_diff: float
 
 @struct.dataclass
 class EnvParams:
@@ -54,6 +55,7 @@ class VerificationCircuitSynthesisEnv(environment.Environment):
         group_ancillas (boolean, optional): If set to True, this will group ancilla into two. Useful to replicate the protocol in Chamberland and Chao original paper. For example: If there are 4 flag qubits, there will be no two-qubit gates between flag qubits 1,2 and 3,4. 
         plus_ancilla_position (list(int), optional): Initialize flag qubits given in the list as plus state and will measure in the X basis.
             This is useful for non-CSS codes.
+        use_max_reward (boolean, optional): Whether to use MAX RL algorithm.
     """
     
     def __init__(self,
@@ -77,7 +79,8 @@ class VerificationCircuitSynthesisEnv(environment.Environment):
         gates_between_ancilla = True,
         gates_between_data = False, 
         group_ancillas = False,  
-        plus_ancilla_position = []
+        plus_ancilla_position = [],
+        use_max_reward = False
         ):
         """Initialize a verification circuit synthesis environment.
         """
@@ -204,6 +207,8 @@ class VerificationCircuitSynthesisEnv(environment.Environment):
 
         ## Generate observation
         self.obs_shape  =  self.get_observation(self.initial_tableau_with_ancillas.current_tableau[0]).flatten().shape
+
+        self.use_max_reward = use_max_reward
 
     def stim_tableau_to_numpy(self, stim_tableau, num_ancillas = 0):
         ''' Convert stim tableau to proper numpy tableau for our simulator.
@@ -800,20 +805,32 @@ class VerificationCircuitSynthesisEnv(environment.Environment):
         reward = self.weight_ancillas * (current_product_ancilla - state.previous_product_ancilla) +  \
                         self.weight_flag * (current_flagged_errors - state.previous_flagged_errors) +     \
                         self.weight_distance * (current_distance - state.previous_distance)
-        
 
-        state = EnvState(new_state.astype(jnp.uint8),  new_sign.astype(jnp.uint8), new_propagated_error.astype(jnp.uint8), current_flagged_errors,  current_product_ancilla, current_distance, new_number_of_errors, state.time + 1)
+        
+        new_max_diff = jnp.max(jnp.array([0.0, state.max_diff - reward]))
+        reward_adapted = jnp.max(jnp.array([0.0, reward - state.max_diff]))        
+
+        state = EnvState(new_state.astype(jnp.uint8),  new_sign.astype(jnp.uint8), new_propagated_error.astype(jnp.uint8), current_flagged_errors,  current_product_ancilla, current_distance, new_number_of_errors, state.time + 1, new_max_diff)
 
         # Evaluate termination conditions
         done = self.is_terminal(state)
 
-        return (
-            jax.lax.stop_gradient(self.get_obs(state)),
-            jax.lax.stop_gradient(state),
-            reward,
-            done,           
-            {"discount": self.discount(state, params)},
-        )
+        if self.use_max_reward:
+            return (
+                jax.lax.stop_gradient(self.get_obs(state)),
+                jax.lax.stop_gradient(state),
+                reward_adapted,
+                done,
+                {"discount": self.discount(state, params), "max_reward": reward_adapted},
+            )
+        else:
+            return (
+                jax.lax.stop_gradient(self.get_obs(state)),
+                jax.lax.stop_gradient(state),
+                reward,
+                done,
+                {"discount": self.discount(state, params), "max_reward": reward_adapted},
+            )
 
     def reset_env(self, key: chex.PRNGKey, params: EnvParams) -> Tuple[chex.Array, EnvState]:
         """Performs resetting of environment.
@@ -846,7 +863,8 @@ class VerificationCircuitSynthesisEnv(environment.Environment):
             previous_product_ancilla=previous_product_ancilla,
             previous_distance=previous_distance,
             number_of_errors = self.number_of_initial_errors,
-            time = 0
+            time = 0,
+            max_diff = 0.0
         )
 
         return self.get_obs(state), state
@@ -881,7 +899,10 @@ class VerificationCircuitSynthesisEnv(environment.Environment):
         Returns:
             Observations by appending the tableau and the sign
         """
-        return self.get_observation(state.tableau).flatten()
+        if self.use_max_reward:
+            return jnp.append(self.get_observation(state.tableau).flatten(), state.max_diff)
+        else:
+            return self.get_observation(state.tableau).flatten()
     
     def copy(self):
         """ Copy environment. """
@@ -906,7 +927,8 @@ class VerificationCircuitSynthesisEnv(environment.Environment):
             self.gates_between_ancilla,
             self.gates_between_data,
             self.group_ancillas,
-            self.plus_ancilla_position
+            self.plus_ancilla_position,
+            self.use_max_reward
         )
 
     @property
@@ -925,7 +947,11 @@ class VerificationCircuitSynthesisEnv(environment.Environment):
 
     def observation_space(self, params: EnvParams) -> spaces.Box:
         """Observation space of the environment."""
-        return spaces.Box(0, 1, self.obs_shape, dtype=jnp.uint8)
+        if self.use_max_reward:
+            ## Add x for max rl
+            return spaces.Box(0, 1, self.obs_shape[0] + 1, dtype=jnp.uint8)
+        else:
+            return spaces.Box(0, 1, self.obs_shape, dtype=jnp.uint8)
 
     def state_space(self, params: EnvParams) -> spaces.Dict:
         """State space of the environment."""

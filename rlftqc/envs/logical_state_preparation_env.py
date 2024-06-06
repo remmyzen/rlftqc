@@ -40,6 +40,8 @@ class LogicalStatePreparationEnv(environment.Environment):
         threshold (float, optional): The complementary distance threshold to indicates success. Default: 0.99
         initialize_plus (list(int), optional): Initialize qubits given in the list as plus state instead of zero state.
             This is useful for large CSS codes or CZ is used in the gate set.
+        use_max_reward (boolean, optional): Whether to use MAX RL algorithm.
+
     """
     def __init__(self,
         target,       

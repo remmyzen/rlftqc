@@ -40,6 +40,7 @@ class FTLogicalStatePreparation:
             This is useful for non-CSS codes.    
         distance_metric (str, optional): Distance metric to use for the complementary distance reward.
                 Currently only support 'hamming' or 'jaccard' (default). 
+        use_max_reward (boolean, optional): Whether to use MAX RL algorithm.
         training_config (optional): Training configuration.
         seed (int, optional): Random seed (default: 42) 
     """
@@ -66,6 +67,7 @@ class FTLogicalStatePreparation:
         cz_ancilla_only = False,
         plus_ancilla_position = [],  
         distance_metric = 'jaccard',
+        use_max_reward = False,
         training_config = None,
         seed = 42):
         """ Initialize a integrated fault-tolerant state preparation task. """
@@ -92,7 +94,8 @@ class FTLogicalStatePreparation:
                 group_ancillas,  
                 cz_ancilla_only,
                 plus_ancilla_position,
-                distance_metric)
+                distance_metric,
+                use_max_reward)
 
         self.seed = seed
 
