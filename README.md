@@ -136,5 +136,6 @@ The code in this repository is released under the MIT License.
 
 ## References
 [1] Chamberland, Christopher, and Michael E. Beverland. "Flag fault-tolerant error correction with arbitrary distance codes." Quantum 2 (2018): 53.
-[2] Nägele, M., Olle, J., Fösel, T., Zen, R., & Marquardt, F. (2024). Tackling Decision Processes with Non-Cumulative Objectives using Reinforcement Learning. arXiv:2405.13609.
+
+[2] Nägele, Maximilian, Jan Olle, Thomas Fösel, Remmy Zen, and Florian Marquardt. "Tackling Decision Processes with Non-Cumulative Objectives using Reinforcement Learning." arXiv:2405.13609 (2024).
 
