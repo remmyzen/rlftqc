@@ -26,6 +26,7 @@ For all the tasks, the user can specify the Clifford gate set and qubit connecti
 
 <img src="images/overview.png" alt="overview" width="800"/>
 
+The implementation of reinforcement learning with a non-cumulative reward based on [2] is also possible by setting `use_max_reward = True` in the environments.
 
 ## Installation
 
@@ -135,4 +136,5 @@ The code in this repository is released under the MIT License.
 
 ## References
 [1] Chamberland, Christopher, and Michael E. Beverland. "Flag fault-tolerant error correction with arbitrary distance codes." Quantum 2 (2018): 53.
+[2] Nägele, M., Olle, J., Fösel, T., Zen, R., & Marquardt, F. (2024). Tackling Decision Processes with Non-Cumulative Objectives using Reinforcement Learning. arXiv:2405.13609.
 
