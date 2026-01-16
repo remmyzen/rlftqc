@@ -393,6 +393,8 @@ class VerificationCircuitSynthesisEnv(environment.Environment):
                         error_str = list("I" * self.n_qubits_physical)
                         action_error_str.append(''.join(error_str))
 
+                    self.action_errors.append(PauliString(action_error_str).to_numpy())
+
             ## Two qubit gates
             elif len(signature(gate).parameters) == 2:
 
