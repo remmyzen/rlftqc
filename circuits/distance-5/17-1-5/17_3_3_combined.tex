@@ -1,0 +1,34 @@
+\documentclass[border=2px]{standalone}
+
+\usepackage[braket, qm]{qcircuit}
+\usepackage{graphicx}
+
+\begin{document}
+\scalebox{1.0}{
+\Qcircuit @C=1.0em @R=0.2em @!R { \\
+	 	\nghost{{q}_{0} :  } & \lstick{{q}_{0} :  } & \gate{\mathrm{H}} & \ctrl{9} & \qw & \qw & \qw & \ctrl{16} & \qw & \qw & \qw & \ctrl{15} & \targ & \qw & \qw \barrier[0em]{23} & \qw & \qw & \ctrl{18} & \qw & \qw & \qw & \qw & \qw & \qw & \qw & \qw & \qw & \qw & \qw & \qw & \qw & \qw & \qw\\
+	 	\nghost{{q}_{1} :  } & \lstick{{q}_{1} :  } & \qw & \qw & \targ & \targ & \targ & \qw & \qw & \qw & \ctrl{2} & \qw & \qw & \qw & \qw & \qw & \qw & \qw & \ctrl{18} & \qw & \qw & \qw & \qw & \qw & \qw & \qw & \qw & \qw & \qw & \qw & \qw & \qw & \qw\\
+	 	\nghost{{q}_{2} :  } & \lstick{{q}_{2} :  } & \gate{\mathrm{H}} & \qw & \qw & \qw & \ctrl{-1} & \qw & \qw & \qw & \qw & \qw & \ctrl{-2} & \qw & \qw & \qw & \qw & \qw & \qw & \qw & \qw & \qw & \qw & \qw & \qw & \qw & \qw & \qw & \qw & \qw & \qw & \qw & \qw\\
+	 	\nghost{{q}_{3} :  } & \lstick{{q}_{3} :  } & \qw & \qw & \qw & \qw & \qw & \qw & \targ & \ctrl{2} & \targ & \qw & \qw & \qw & \qw & \qw & \qw & \qw & \qw & \qw & \ctrl{15} & \qw & \qw & \ctrl{16} & \qw & \qw & \qw & \qw & \qw & \qw & \qw & \qw & \qw\\
+	 	\nghost{{q}_{4} :  } & \lstick{{q}_{4} :  } & \gate{\mathrm{H}} & \qw & \qw & \ctrl{-3} & \qw & \qw & \qw & \qw & \targ & \qw & \ctrl{1} & \qw & \qw & \qw & \qw & \qw & \qw & \qw & \qw & \qw & \ctrl{14} & \qw & \qw & \qw & \qw & \qw & \qw & \qw & \qw & \qw & \qw\\
+	 	\nghost{{q}_{5} :  } & \lstick{{q}_{5} :  } & \qw & \qw & \qw & \qw & \qw & \qw & \qw & \targ & \qw & \qw & \targ & \qw & \qw & \qw & \qw & \qw & \qw & \qw & \qw & \qw & \qw & \qw & \qw & \qw & \qw & \qw & \qw & \qw & \qw & \qw & \qw\\
+	 	\nghost{{q}_{6} :  } & \lstick{{q}_{6} :  } & \gate{\mathrm{H}} & \qw & \qw & \ctrl{5} & \qw & \qw & \qw & \qw & \qw & \qw & \qw & \qw & \qw & \qw & \qw & \qw & \qw & \qw & \qw & \qw & \qw & \qw & \qw & \qw & \qw & \qw & \qw & \qw & \qw & \qw & \qw\\
+	 	\nghost{{q}_{7} :  } & \lstick{{q}_{7} :  } & \qw & \qw & \qw & \qw & \targ & \qw & \qw & \targ & \qw & \qw & \qw & \ctrl{3} & \qw & \qw & \ctrl{10} & \qw & \qw & \qw & \qw & \qw & \qw & \qw & \qw & \qw & \ctrl{12} & \qw & \qw & \qw & \qw & \qw & \qw\\
+	 	\nghost{{q}_{8} :  } & \lstick{{q}_{8} :  } & \gate{\mathrm{H}} & \qw & \qw & \qw & \qw & \qw & \qw & \qw & \ctrl{-4} & \qw & \qw & \qw & \ctrl{1} & \qw & \qw & \qw & \qw & \qw & \qw & \qw & \qw & \qw & \qw & \qw & \qw & \qw & \qw & \qw & \qw & \qw & \qw\\
+	 	\nghost{{q}_{9} :  } & \lstick{{q}_{9} :  } & \qw & \targ & \qw & \qw & \qw & \qw & \ctrl{-6} & \qw & \qw & \qw & \ctrl{3} & \qw & \targ & \qw & \qw & \qw & \qw & \qw & \qw & \qw & \qw & \qw & \qw & \ctrl{9} & \qw & \qw & \qw & \qw & \qw & \qw & \qw\\
+	 	\nghost{{q}_{10} :  } & \lstick{{q}_{10} :  } & \gate{\mathrm{H}} & \ctrl{5} & \qw & \qw & \qw & \qw & \qw & \qw & \ctrl{1} & \qw & \qw & \targ & \qw & \qw & \qw & \qw & \qw & \qw & \qw & \qw & \qw & \qw & \qw & \qw & \qw & \qw & \qw & \qw & \qw & \qw & \qw\\
+	 	\nghost{{q}_{11} :  } & \lstick{{q}_{11} :  } & \qw & \qw & \qw & \targ & \qw & \qw & \qw & \ctrl{-4} & \targ & \qw & \qw & \qw & \qw & \qw & \qw & \qw & \qw & \ctrl{6} & \qw & \qw & \qw & \qw & \qw & \qw & \qw & \qw & \qw & \ctrl{8} & \qw & \qw & \qw\\
+	 	\nghost{{q}_{12} :  } & \lstick{{q}_{12} :  } & \gate{\mathrm{H}} & \qw & \ctrl{-11} & \ctrl{1} & \qw & \qw & \qw & \qw & \qw & \qw & \targ & \qw & \qw & \qw & \qw & \qw & \qw & \qw & \qw & \ctrl{5} & \qw & \qw & \qw & \qw & \qw & \qw & \ctrl{6} & \qw & \qw & \qw & \qw\\
+	 	\nghost{{q}_{13} :  } & \lstick{{q}_{13} :  } & \qw & \qw & \qw & \targ & \qw & \qw & \qw & \qw & \qw & \qw & \qw & \qw & \qw & \qw & \qw & \qw & \qw & \qw & \qw & \qw & \qw & \qw & \ctrl{4} & \qw & \qw & \qw & \qw & \qw & \qw & \qw & \qw\\
+	 	\nghost{{q}_{14} :  } & \lstick{{q}_{14} :  } & \gate{\mathrm{H}} & \qw & \qw & \qw & \ctrl{-7} & \qw & \ctrl{2} & \qw & \qw & \qw & \targ & \qw & \qw & \qw & \qw & \qw & \qw & \qw & \qw & \qw & \qw & \qw & \qw & \qw & \qw & \ctrl{3} & \qw & \qw & \ctrl{5} & \qw & \qw\\
+	 	\nghost{{q}_{15} :  } & \lstick{{q}_{15} :  } & \qw & \targ & \qw & \qw & \qw & \qw & \qw & \qw & \qw & \targ & \ctrl{-1} & \qw & \qw & \qw & \qw & \qw & \qw & \qw & \qw & \qw & \qw & \qw & \qw & \qw & \qw & \qw & \qw & \qw & \qw & \qw & \qw\\
+	 	\nghost{{q}_{16} :  } & \lstick{{q}_{16} :  } & \qw & \qw & \qw & \qw & \qw & \targ & \targ & \qw & \qw & \qw & \qw & \qw & \qw & \qw & \qw & \qw & \qw & \qw & \qw & \qw & \qw & \qw & \qw & \qw & \qw & \qw & \qw & \qw & \qw & \qw & \qw\\
+	 	\nghost{{q}_{17} :  } & \lstick{{q}_{17} :  } & \qw & \qw & \qw & \qw & \qw & \qw & \qw & \qw & \qw & \qw & \qw & \qw & \qw & \qw & \targ & \qw & \qw & \targ & \qw & \targ & \qw & \qw & \targ & \qw & \qw & \targ & \qw & \qw & \qw & \qw & \qw\\
+	 	\nghost{{q}_{18} :  } & \lstick{{q}_{18} :  } & \qw & \qw & \qw & \qw & \qw & \qw & \qw & \qw & \qw & \qw & \qw & \qw & \qw & \qw & \qw & \targ & \qw & \qw & \targ & \qw & \targ & \qw & \qw & \targ & \qw & \qw & \targ & \qw & \qw & \qw & \qw\\
+	 	\nghost{{q}_{19} :  } & \lstick{{q}_{19} :  } & \qw & \qw & \qw & \qw & \qw & \qw & \qw & \qw & \qw & \qw & \qw & \qw & \qw & \qw & \qw & \qw & \targ & \qw & \qw & \qw & \qw & \targ & \qw & \qw & \targ & \qw & \qw & \targ & \targ & \qw & \qw\\
+	 	\nghost{{q}_{20} :  } & \lstick{{q}_{20} :  } & \qw & \qw & \qw & \qw & \qw & \qw & \qw & \qw & \qw & \qw & \qw & \qw & \qw & \qw & \qw & \qw & \qw & \qw & \qw & \qw & \qw & \qw & \qw & \qw & \qw & \qw & \qw & \qw & \qw & \qw & \qw\\
+	 	\nghost{{q}_{21} :  } & \lstick{{q}_{21} :  } & \qw & \qw & \qw & \qw & \qw & \qw & \qw & \qw & \qw & \qw & \qw & \qw & \qw & \qw & \qw & \qw & \qw & \qw & \qw & \qw & \qw & \qw & \qw & \qw & \qw & \qw & \qw & \qw & \qw & \qw & \qw\\
+	 	\nghost{{q}_{22} :  } & \lstick{{q}_{22} :  } & \qw & \qw & \qw & \qw & \qw & \qw & \qw & \qw & \qw & \qw & \qw & \qw & \qw & \qw & \qw & \qw & \qw & \qw & \qw & \qw & \qw & \qw & \qw & \qw & \qw & \qw & \qw & \qw & \qw & \qw & \qw\\
+	 	\nghost{{q}_{23} :  } & \lstick{{q}_{23} :  } & \qw & \qw & \qw & \qw & \qw & \qw & \qw & \qw & \qw & \qw & \qw & \qw & \qw & \qw & \qw & \qw & \qw & \qw & \qw & \qw & \qw & \qw & \qw & \qw & \qw & \qw & \qw & \qw & \qw & \qw & \qw\\
+\\ }}
+\end{document}

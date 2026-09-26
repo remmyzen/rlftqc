@@ -1,0 +1,15 @@
+\documentclass[border=2px]{standalone}
+
+\usepackage[braket, qm]{qcircuit}
+\usepackage{graphicx}
+
+\begin{document}
+\scalebox{1.0}{
+\Qcircuit @C=1.0em @R=0.2em @!R { \\
+	 	\nghost{{q}_{0} :  } & \lstick{{q}_{0} :  } & \gate{\mathrm{\sqrt{X}}} & \ctrl{3} & \gate{\mathrm{X}} & \qw & \qw & \qw & \qw & \qw & \qw & \qw & \qw\\
+	 	\nghost{{q}_{1} :  } & \lstick{{q}_{1} :  } & \gate{\mathrm{\sqrt{X}}} & \qw & \targ & \qw & \qw & \qw & \ctrl{3} & \gate{\mathrm{S}} & \qw & \qw & \qw\\
+	 	\nghost{{q}_{2} :  } & \lstick{{q}_{2} :  } & \gate{\mathrm{\sqrt{X}}} & \qw & \qw & \targ & \qw & \qw & \qw & \ctrl{1} & \gate{\mathrm{S}} & \qw & \qw\\
+	 	\nghost{{q}_{3} :  } & \lstick{{q}_{3} :  } & \qw & \targ & \qw & \ctrl{-1} & \ctrl{1} & \targ & \qw & \targ & \qw & \qw & \qw\\
+	 	\nghost{{q}_{4} :  } & \lstick{{q}_{4} :  } & \gate{\mathrm{\sqrt{X}}} & \qw & \ctrl{-3} & \qw & \targ & \ctrl{-1} & \targ & \gate{\mathrm{X}} & \qw & \qw & \qw\\
+\\ }}
+\end{document}
