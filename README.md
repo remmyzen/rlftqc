@@ -113,7 +113,7 @@ Refer to the notebook `notebooks/03 - Integrated Fault-Tolerant Logical State Pr
  for more advanced examples. 
 ## Circuit Examples
 
-Go to this <a href="https://owncloud.gwdg.de/index.php/s/OsfE9WuvTitJuZv" target="_blank">link</a> to see the circuit examples that the RL agent has synthesized for various tasks in PNG, stim, and Latex formats.
+Go to the directory [circuits](circuits/) to see the circuit examples that the RL agent has synthesized for various tasks in PNG, stim, and Latex formats. The circuits are also available at [qecirc.com](https://qecirc.com)
 
 ## License
 
